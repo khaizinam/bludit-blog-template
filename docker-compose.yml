@@ -1,0 +1,29 @@
+services:
+  app:
+    build:
+      context: .
+      network: host
+    container_name: bludit_app
+    volumes:
+      - ./public_html:/var/www/html
+    environment:
+      - TZ=UTC
+    networks:
+      - bludit_network
+
+  web:
+    image: nginx:alpine
+    container_name: bludit_web
+    ports:
+      - "8085:80"
+    volumes:
+      - ./public_html:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - bludit_network
+
+networks:
+  bludit_network:
+    driver: bridge

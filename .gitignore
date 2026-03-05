@@ -1,0 +1,55 @@
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Docker files
+.docker/
+docker-compose.override.yml
+
+# Environment
+.env
+
+# Bludit specific (mapped to public_html)
+public_html/bl-content/*
+!public_html/bl-content/.keep
+public_html/dbgenerator.php
+public_html/bl-content-migrator
+public_html/bl-plugins/timemachine
+public_html/bl-plugins/timemachine-x
+public_html/bl-plugins/backup-manager
+public_html/bl-plugins/discovery
+public_html/bl-plugins/updater
+public_html/bl-plugins/medium-editor
+public_html/bl-plugins/quill
+public_html/bl-plugins/yandex-metrica/
+public_html/bl-plugins/domain-migrator/
+public_html/bl-plugins/tail-writer/
+public_html/bl-kernel/bludit.pro.*.php
+public_html/bl-kernel/admin/themes/gris
+public_html/bl-themes/docs
+public_html/bl-themes/typerite
+public_html/bl-themes/docsx
+public_html/bl-themes/editorial
+public_html/bl-themes/mediumish
+public_html/bl-themes/clean-blog
+public_html/bl-themes/grayscale
+public_html/bl-themes/massively
+public_html/bl-themes/hyperspace
+public_html/bl-themes/striped
+public_html/bl-themes/log
+public_html/bl-themes/micro
+public_html/bl-themes/tagg
+public_html/bl-themes/small
+public_html/bl-themes/future-imperfect
+public_html/bl-themes/social-network
+
+# Development logs/scripts
+public_html/test-server.sh
+public_html/test-php85-compatibility.php
+public_html/php85-server.log
+public_html/analyze-logs.sh

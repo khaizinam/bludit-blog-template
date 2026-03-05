@@ -1,0 +1,11 @@
+{
+	"name": "Premium Tailwind",
+	"description": "A premium, fully responsive theme powered by Tailwind CSS with Dark/Light mode support.",
+	"version": "1.0.0",
+	"author": "Antigravity",
+	"website": "https://www.bludit.com",
+	"template": {
+		"home": "home.php",
+		"page": "page.php"
+	}
+}
