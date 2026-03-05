@@ -127,6 +127,10 @@
     var q = $(form).find('input[name="q"]').val().trim();
     if (!q) return false;
     var baseUrl = window.SITE_URL || (window.location.origin + "/");
+    // Đảm bảo baseUrl luôn kết thúc bằng một dấu "/"
+    if (baseUrl.charAt(baseUrl.length - 1) !== '/') {
+        baseUrl += '/';
+    }
     window.location.href = baseUrl + "search/" + encodeURIComponent(q);
     return false;
   };
@@ -134,17 +138,24 @@
   function openSearchOverlay() {
     var $overlay = $('#search-overlay');
     if (!$overlay.length) return;
+    $overlay.css('display', 'flex');
+    // Trigger reflow để transition opacity hoạt động
+    $overlay[0].offsetHeight;
     $overlay.addClass('is-open');
     $('body').css('overflow', 'hidden');
-    // Focus input sau khi transition kết thúc (250ms)
     setTimeout(function () {
       $('#search-overlay-input').trigger('focus');
     }, 260);
   }
 
   function closeSearchOverlay() {
-    $('#search-overlay').removeClass('is-open');
+    var $overlay = $('#search-overlay');
+    $overlay.removeClass('is-open');
     $('body').css('overflow', '');
+    // Ẩn hoàn toàn sau khi transition kết thúc (250ms)
+    setTimeout(function () {
+      $overlay.css('display', 'none');
+    }, 260);
   }
 
   /* =============================================================

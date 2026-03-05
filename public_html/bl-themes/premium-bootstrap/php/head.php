@@ -20,8 +20,8 @@
 <!-- Bootstrap 5 CSS (local) -->
 <link rel="stylesheet" href="<?php echo DOMAIN_THEME . 'css/bootstrap.min.css'; ?>">
 
-<!-- Theme CSS -->
-<?php echo Theme::css('css/main.css'); ?>
+<!-- Theme CSS (cache-bust chung từ index) -->
+<link rel="stylesheet" href="<?php echo DOMAIN_THEME . 'css/main.css?v=' . $themeVer; ?>">
 
 <!-- Dark mode: apply before paint to avoid flash -->
 <script>

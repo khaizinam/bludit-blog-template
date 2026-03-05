@@ -794,19 +794,17 @@ a:hover .footer-site-name { color: var(--primary-500); }
    SEARCH — Overlay fullscreen
    ============================================================= */
 #search-overlay {
+  display: none;
   position: fixed;
   inset: 0;
   z-index: 2000;
-  display: flex;
   align-items: flex-start;
   justify-content: center;
   padding-top: 15vh;
-  visibility: hidden;
   opacity: 0;
-  transition: opacity 0.25s ease, visibility 0.25s ease;
+  transition: opacity 0.25s ease;
 }
 #search-overlay.is-open {
-  visibility: visible;
   opacity: 1;
 }
 

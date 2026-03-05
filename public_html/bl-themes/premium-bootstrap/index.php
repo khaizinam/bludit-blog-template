@@ -1,3 +1,7 @@
+<?php
+// Tự động tạo mã version dứa trên file sửa đổi mới nhất (cho CSS/JS chung)
+$themeVer = '1.0.1';
+?>
 <!DOCTYPE html>
 <html lang="<?php echo Theme::lang(); ?>">
 <head>

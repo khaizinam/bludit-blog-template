@@ -89,8 +89,8 @@
 <script src="<?php echo DOMAIN_THEME . 'js/jquery.min.js'; ?>"></script>
 <!-- Bootstrap 5 JS (local) -->
 <script src="<?php echo DOMAIN_THEME . 'js/bootstrap.bundle.min.js'; ?>"></script>
-<!-- Theme JS -->
-<?php echo Theme::js('js/main.js'); ?>
+<!-- Theme JS (cache-bust chung từ index) -->
+<script src="<?php echo DOMAIN_THEME . 'js/main.js?v=' . $themeVer; ?>"></script>
 
 <!-- Bludit Footer Plugins -->
 <?php Theme::plugins('siteBodyEnd'); ?>

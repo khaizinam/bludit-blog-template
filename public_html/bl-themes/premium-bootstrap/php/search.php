@@ -2,15 +2,15 @@
 // Lấy từ khoá tìm kiếm từ URL (Bludit truyền qua biến $searchTerm hoặc parse từ URL)
 $keyword = "";
 if (!empty($searchTerm)) {
-    $keyword = Text::h($searchTerm);
+    $keyword = htmlspecialchars($searchTerm, ENT_QUOTES, 'UTF-8');
 } elseif (!empty($_GET["search"])) {
-    $keyword = Text::h($_GET["search"]);
+    $keyword = htmlspecialchars($_GET["search"], ENT_QUOTES, 'UTF-8');
 } else {
     // Parse keyword từ URL: .../search/keyword
     $path  = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
     $parts = explode("/search/", $path);
     if (isset($parts[1])) {
-        $keyword = Text::h(urldecode(trim($parts[1], "/")));
+        $keyword = htmlspecialchars(urldecode(trim($parts[1], "/")), ENT_QUOTES, 'UTF-8');
     }
 }
 ?>
