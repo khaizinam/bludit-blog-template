@@ -34,22 +34,8 @@
   });
 
   /* =============================================================
-     BREAKING BAR — pause marquee on hover
-     (marquee tag handles itself, but we add jQuery fallback)
+     BUILD HTML HELPER — list-article row
      ============================================================= */
-  // Already handled by inline onmouseover/onmouseout on <marquee>,
-  // but we rebuild it as a CSS ticker fallback if needed.
-
-  /* =============================================================
-     LOAD MORE — replaces Alpine.js articleLoader
-     ============================================================= */
-  var articleLoader = {
-    offset: 14,
-    loading: false,
-    done: false,
-    placeholderUrl: ''   // set from PHP via window.THEME_IMG
-  };
-
   function buildListArticleHTML(item) {
     var placeholder = window.THEME_IMG || '';
     return '<div class="list-article fade-in-up">' +
@@ -68,56 +54,97 @@
     '</div>';
   }
 
-  $('#btn-load-more').on('click', function () {
-    if (articleLoader.loading || articleLoader.done) return;
+  /* =============================================================
+     GENERIC LOAD-MORE INITIALISER
+     Fix #4: ẩn nút ngay khi total <= offset (không còn bài)
+     ============================================================= */
+  function initLoadMore(opts) {
+    // opts: { btnId, listId, doneMsgId, startOffset, batchSize, totalAttr }
+    var $section  = $(opts.btnId).closest('[data-total]');
+    var total     = parseInt($section.attr('data-total'), 10) || 0;
+    var loader    = { offset: opts.startOffset, loading: false, done: false };
 
-    articleLoader.loading = true;
-    var $btn = $(this);
-    var $spinner = $btn.find('.spinner-text');
-    var $label   = $btn.find('.load-label');
-    var $icon    = $btn.find('.load-icon');
+    var $btn      = $(opts.btnId);
+    var $list     = $(opts.listId);
+    var $doneMsg  = $(opts.doneMsgId);
 
-    $spinner.show();
-    $label.hide();
-    $icon.hide();
-    $btn.prop('disabled', true);
+    // Fix #4: ẩn nút ngay khi không còn bài nào để load
+    if (total <= opts.startOffset) {
+      $btn.hide();
+      return;
+    }
 
-    $.getJSON('?ajax=1&offset=' + articleLoader.offset)
-      .done(function (data) {
-        if (!data || data.length === 0) {
-          articleLoader.done = true;
-          $btn.hide();
-          $('#load-done-msg').fadeIn();
-        } else {
-          var $list = $('#article-list');
-          $.each(data, function (i, item) {
-            $list.append(buildListArticleHTML(item));
-          });
-          articleLoader.offset += data.length;
-          if (data.length < 8) {
-            articleLoader.done = true;
+    $btn.on('click', function () {
+      if (loader.loading || loader.done) return;
+      loader.loading = true;
+
+      var $spinner = $btn.find('.spinner-text');
+      var $label   = $btn.find('.load-label');
+      var $icon    = $btn.find('.load-icon, svg:not(.spinner-text svg)');
+
+      $spinner.removeClass('d-none').show();
+      $label.hide();
+      $icon.hide();
+      $btn.prop('disabled', true);
+
+      $.getJSON('?ajax=1&offset=' + loader.offset)
+        .done(function (data) {
+          if (!data || data.length === 0) {
+            loader.done = true;
             $btn.hide();
-            $('#load-done-msg').fadeIn();
+            $doneMsg.fadeIn();
+          } else {
+            $.each(data, function (i, item) {
+              $list.append(buildListArticleHTML(item));
+            });
+            loader.offset += data.length;
+            if (data.length < opts.batchSize) {
+              loader.done = true;
+              $btn.hide();
+              $doneMsg.fadeIn();
+            }
           }
-        }
-      })
-      .fail(function () {
-        console.error('Lỗi khi tải bài viết');
-      })
-      .always(function () {
-        articleLoader.loading = false;
-        $spinner.hide();
-        $label.show();
-        $icon.show();
-        $btn.prop('disabled', false);
-      });
-  });
+        })
+        .fail(function () {
+          console.error('Lỗi khi tải bài viết');
+        })
+        .always(function () {
+          loader.loading = false;
+          $spinner.addClass('d-none').hide();
+          $label.show();
+          $icon.show();
+          $btn.prop('disabled', false);
+        });
+    });
+  }
 
   /* =============================================================
      INIT
      ============================================================= */
   $(function () {
     initDarkMode();
+
+    // Home page load-more (articles start from offset 14: 6 in grid + 8 in list)
+    if ($('#btn-load-more').length) {
+      initLoadMore({
+        btnId:       '#btn-load-more',
+        listId:      '#article-list',
+        doneMsgId:   '#load-done-msg',
+        startOffset: 14,
+        batchSize:   8
+      });
+    }
+
+    // Page view load-more (articles listed from offset 8)
+    if ($('#btn-page-load-more').length) {
+      initLoadMore({
+        btnId:       '#btn-page-load-more',
+        listId:      '#page-article-list',
+        doneMsgId:   '#page-load-done-msg',
+        startOffset: 8,
+        batchSize:   8
+      });
+    }
   });
 
 })(jQuery);

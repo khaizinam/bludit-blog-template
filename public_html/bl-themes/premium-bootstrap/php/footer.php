@@ -5,11 +5,12 @@
             <!-- Column 1: Brand & Slogan -->
             <div class="col-12 col-md-4">
                 <div class="mb-4">
-                    <a href="<?php echo $site->url(); ?>" class="text-decoration-none">
+                    <a href="<?php echo $site->url(); ?>" class="text-decoration-none d-flex align-items-center">
                         <?php if ($site->logo()): ?>
                             <img src="<?php echo $site->logo(); ?>"
                                  alt="<?php echo $site->title(); ?>"
                                  style="height:32px; width:auto;">
+                            <span class="footer-site-name"><?php echo $site->title(); ?></span>
                         <?php else: ?>
                             <span class="footer-brand-text"><?php echo $site->title(); ?></span>
                         <?php endif; ?>
@@ -84,10 +85,10 @@
     </div>
 </footer>
 
-<!-- jQuery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<!-- Bootstrap 5 JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+<!-- jQuery (local) -->
+<script src="<?php echo DOMAIN_THEME . 'js/jquery.min.js'; ?>"></script>
+<!-- Bootstrap 5 JS (local) -->
+<script src="<?php echo DOMAIN_THEME . 'js/bootstrap.bundle.min.js'; ?>"></script>
 <!-- Theme JS -->
 <?php echo Theme::js('js/main.js'); ?>
 

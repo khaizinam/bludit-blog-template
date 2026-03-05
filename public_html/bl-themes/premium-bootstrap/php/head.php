@@ -15,13 +15,10 @@
     <?php echo Theme::favicon('img/favicon.png'); ?>
 <?php endif; ?>
 
-<!-- Google Fonts: Inter -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<!-- Google Fonts: Inter (loaded via main.css @import) -->
 
-<!-- Bootstrap 5 CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+<!-- Bootstrap 5 CSS (local) -->
+<link rel="stylesheet" href="<?php echo DOMAIN_THEME . 'css/bootstrap.min.css'; ?>">
 
 <!-- Theme CSS -->
 <?php echo Theme::css('css/main.css'); ?>

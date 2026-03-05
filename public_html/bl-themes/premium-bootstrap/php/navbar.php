@@ -8,6 +8,7 @@
                     <img src="<?php echo $site->logo(); ?>"
                          alt="<?php echo $site->title(); ?>"
                          style="height:40px; width:auto; object-fit:contain;">
+                    <span class="navbar-site-name"><?php echo $site->title(); ?></span>
                 <?php else: ?>
                     <span class="navbar-brand-text"><?php echo $site->title(); ?></span>
                 <?php endif; ?>

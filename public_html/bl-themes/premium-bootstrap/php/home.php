@@ -127,7 +127,8 @@ foreach ($pages->db as $key => $fields) {
     </section>
 
     <!-- SECTION 4 — TẤT CẢ BÀI VIẾT + LOAD MORE -->
-    <section class="container py-4" style="max-width:80rem;">
+    <section class="container py-4" style="max-width:80rem;"
+             data-total="<?php echo count($allPages); ?>">
         <h2 class="section-heading">Tất cả bài viết</h2>
 
         <div id="article-list" class="mb-4">
