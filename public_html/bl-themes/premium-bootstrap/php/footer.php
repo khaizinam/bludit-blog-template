@@ -1,0 +1,95 @@
+<footer id="main-footer">
+    <div class="container py-5 py-md-5" style="max-width:80rem;">
+        <div class="row g-5" style="color:var(--text-muted);">
+
+            <!-- Column 1: Brand & Slogan -->
+            <div class="col-12 col-md-4">
+                <div class="mb-4">
+                    <a href="<?php echo $site->url(); ?>" class="text-decoration-none">
+                        <?php if ($site->logo()): ?>
+                            <img src="<?php echo $site->logo(); ?>"
+                                 alt="<?php echo $site->title(); ?>"
+                                 style="height:32px; width:auto;">
+                        <?php else: ?>
+                            <span class="footer-brand-text"><?php echo $site->title(); ?></span>
+                        <?php endif; ?>
+                    </a>
+                </div>
+                <p class="text-uppercase fw-semibold small lh-base mb-4" style="max-width:18rem; letter-spacing:.04em;">
+                    <?php echo $site->slogan(); ?>
+                </p>
+                <!-- Social Networks -->
+                <div class="d-flex flex-wrap gap-2">
+                    <?php foreach (Theme::socialNetworks() as $key => $name): ?>
+                        <a href="<?php echo $site->{$key}(); ?>"
+                           target="_blank" rel="noopener noreferrer"
+                           class="social-badge" title="<?php echo $name; ?>">
+                            <?php echo substr($name, 0, 2); ?>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <!-- Column 2: Categories -->
+            <div class="col-12 col-md-4">
+                <h3 class="footer-title">Categories</h3>
+                <nav class="d-flex flex-column">
+                    <?php foreach ($categories->keys() as $key): ?>
+                        <?php $category = new Category($key); ?>
+                        <?php if (count($category->pages()) > 0): ?>
+                            <a href="<?php echo $category->permalink(); ?>" class="footer-link">
+                                <?php echo $category->name(); ?>
+                                <span class="category-count"><?php echo count($category->pages()); ?></span>
+                            </a>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </nav>
+            </div>
+
+            <!-- Column 3: Navigation -->
+            <div class="col-12 col-md-4">
+                <h3 class="footer-title">Menu</h3>
+                <nav class="d-flex flex-column">
+                    <a href="<?php echo $site->url(); ?>" class="footer-link">Home</a>
+                    <?php foreach ($staticContent as $staticPage): ?>
+                        <a href="<?php echo $staticPage->permalink(); ?>" class="footer-link">
+                            <?php echo $staticPage->title(); ?>
+                        </a>
+                    <?php endforeach; ?>
+                </nav>
+            </div>
+
+        </div>
+
+        <!-- Bottom bar -->
+        <div class="footer-bottom d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+            <div><?php echo $site->footer(); ?></div>
+            <div class="d-flex align-items-center gap-4">
+                <?php if (!defined('BLUDIT_PRO')): ?>
+                    <div class="d-flex align-items-center gap-2">
+                        <img class="bludit-logo"
+                             src="<?php echo DOMAIN_THEME_IMG.'favicon.png'; ?>"
+                             alt="Bludit">
+                        <span>Powered by
+                            <a href="https://www.bludit.com" target="_blank" rel="noopener"
+                               style="color:var(--primary-600);text-decoration:underline;text-underline-offset:4px;">
+                                BLUDIT
+                            </a>
+                        </span>
+                    </div>
+                <?php endif; ?>
+                <span>Copyright &copy; <?php echo date('Y'); ?> <?php echo $site->title(); ?></span>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<!-- Bootstrap 5 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+<!-- Theme JS -->
+<?php echo Theme::js('js/main.js'); ?>
+
+<!-- Bludit Footer Plugins -->
+<?php Theme::plugins('siteBodyEnd'); ?>
