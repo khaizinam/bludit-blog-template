@@ -770,3 +770,249 @@ a:hover .footer-site-name { color: var(--primary-500); }
   .list-article-img-wrap { width: 90px; height: 60px; }
   .list-article-img { width: 90px; height: 60px; }
 }
+
+/* =============================================================
+   SEARCH — Icon button (navbar)
+   ============================================================= */
+#btn-search {
+  width: 38px;
+  height: 38px;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  background: var(--bg-nav);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, background 0.2s;
+  cursor: pointer;
+  color: var(--text-body);
+}
+#btn-search:hover { transform: scale(1.1); background: var(--bg-card); }
+#btn-search svg { width: 18px; height: 18px; }
+
+/* =============================================================
+   SEARCH — Overlay fullscreen
+   ============================================================= */
+#search-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 15vh;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+#search-overlay.is-open {
+  visibility: visible;
+  opacity: 1;
+}
+
+.search-overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.search-overlay-box {
+  position: relative;
+  width: 100%;
+  max-width: 680px;
+  padding: 0 1.25rem;
+  transform: translateY(-16px);
+  transition: transform 0.25s ease;
+}
+#search-overlay.is-open .search-overlay-box { transform: translateY(0); }
+
+.search-overlay-form {
+  display: flex;
+  align-items: center;
+  background: var(--bg-card);
+  border: 2px solid var(--primary-500);
+  border-radius: 1.25rem;
+  padding: 0.75rem 1rem;
+  gap: 0.75rem;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+}
+
+.search-overlay-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
+.search-overlay-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text-body);
+  outline: none;
+  font-family: 'Inter', sans-serif;
+}
+.search-overlay-input::placeholder { color: var(--text-faint); }
+
+#btn-search-close {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: color 0.2s, border-color 0.2s;
+}
+#btn-search-close:hover { color: var(--text-body); border-color: var(--text-muted); }
+#btn-search-close svg { width: 16px; height: 16px; }
+
+.search-overlay-hint {
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: 0.75rem;
+  letter-spacing: 0.04em;
+}
+.search-overlay-hint kbd {
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: 4px;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* =============================================================
+   SEARCH — Mobile form (in hamburger menu)
+   ============================================================= */
+.search-mobile-form { width: 100%; }
+
+.search-mobile-input-wrap {
+  display: flex;
+  align-items: center;
+  background: var(--bg-body);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.6rem 0.875rem;
+  gap: 0.5rem;
+}
+.search-mobile-input-wrap svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--text-faint);
+}
+.search-mobile-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 0.875rem;
+  color: var(--text-body);
+  outline: none;
+  font-family: 'Inter', sans-serif;
+}
+.search-mobile-input::placeholder { color: var(--text-faint); }
+
+/* =============================================================
+   SEARCH — Results page
+   ============================================================= */
+.search-result-wrap { padding: 0; }
+
+.search-result-header { margin-bottom: 2rem; }
+
+.search-result-title {
+  font-size: 1.75rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: var(--text-body);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.search-result-keyword {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+.search-result-keyword strong { color: var(--accent); }
+
+.search-result-form {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+  align-items: center;
+}
+
+.search-result-input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: 0.875rem;
+  padding: 0.7rem 1rem;
+  gap: 0.625rem;
+  transition: border-color 0.2s;
+}
+.search-result-input-wrap:focus-within { border-color: var(--primary-500); }
+.search-result-input-wrap svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--text-faint);
+}
+.search-result-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  color: var(--text-body);
+  outline: none;
+  font-family: 'Inter', sans-serif;
+}
+.search-result-input::placeholder { color: var(--text-faint); }
+
+.search-result-btn {
+  padding: 0.7rem 1.5rem;
+  background: var(--primary-600);
+  color: #fff;
+  border: none;
+  border-radius: 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+.search-result-btn:hover { background: var(--primary-700); }
+
+.search-result-list { margin-top: 0.5rem; }
+
+.search-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-muted);
+}
+.search-empty p {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-body);
+}
+.search-empty small { font-size: 0.875rem; }
+

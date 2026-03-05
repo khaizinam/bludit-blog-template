@@ -16,11 +16,14 @@
         <?php
             if ($WHERE_AM_I == 'page') {
                 include(THEME_DIR_PHP . 'page.php');
+            } elseif ($WHERE_AM_I == 'search') {
+                include(THEME_DIR_PHP . 'search.php');
             } else {
                 include(THEME_DIR_PHP . 'home.php');
             }
         ?>
     </main>
+
 
     <!-- Footer -->
     <?php include(THEME_DIR_PHP . 'footer.php'); ?>

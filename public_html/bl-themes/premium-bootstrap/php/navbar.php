@@ -1,3 +1,4 @@
+<script>window.SITE_URL = '<?php echo $site->url(); ?>';</script>
 <nav id="main-navbar" class="glass">
     <div class="container" style="max-width:80rem;">
         <div class="d-flex align-items-center justify-content-between h-100 px-3">
@@ -26,6 +27,16 @@
                         </a>
                     <?php endforeach; ?>
                 </div>
+
+                <?php if (pluginActivated('pluginSearch')): ?>
+                <!-- Search toggle button -->
+                <button id="btn-search" aria-label="Tìm kiếm">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"></path>
+                    </svg>
+                </button>
+                <?php endif; ?>
 
                 <!-- Dark mode toggle -->
                 <button id="btn-dark-mode" aria-label="Toggle dark mode">
@@ -57,7 +68,48 @@
                         <?php echo $staticPage->title(); ?>
                     </a>
                 <?php endforeach; ?>
+
+                <?php if (pluginActivated('pluginSearch')): ?>
+                <!-- Search form in mobile menu -->
+                <form class="search-mobile-form mt-2" role="search" onsubmit="return searchSubmit(this);">
+                    <div class="search-mobile-input-wrap">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"></path>
+                        </svg>
+                        <input type="search" name="q" class="search-mobile-input"
+                               placeholder="Tìm kiếm bài viết..."
+                               aria-label="Tìm kiếm">
+                    </div>
+                </form>
+                <?php endif; ?>
             </div>
         </div>
     </div>
 </nav>
+
+<?php if (pluginActivated('pluginSearch')): ?>
+<!-- Search Overlay -->
+<div id="search-overlay" role="dialog" aria-modal="true" aria-label="Tìm kiếm">
+    <div class="search-overlay-backdrop" id="search-backdrop"></div>
+    <div class="search-overlay-box">
+        <form class="search-overlay-form" role="search" onsubmit="return searchSubmit(this);">
+            <svg class="search-overlay-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"></path>
+            </svg>
+            <input id="search-overlay-input" type="search" name="q"
+                   class="search-overlay-input"
+                   placeholder="Tìm kiếm bài viết..."
+                   autocomplete="off"
+                   aria-label="Tìm kiếm">
+            <button type="button" id="btn-search-close" aria-label="Đóng tìm kiếm">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </form>
+        <p class="search-overlay-hint">Nhấn <kbd>Enter</kbd> để tìm kiếm · <kbd>Esc</kbd> để đóng</p>
+    </div>
+</div>
+<?php endif; ?>

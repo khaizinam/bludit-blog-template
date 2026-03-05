@@ -119,6 +119,35 @@
   }
 
   /* =============================================================
+     SEARCH
+     ============================================================= */
+
+  // Hàm submit search dùng chung cho cả overlay lẫn mobile form
+  window.searchSubmit = function (form) {
+    var q = $(form).find('input[name="q"]').val().trim();
+    if (!q) return false;
+    var baseUrl = window.SITE_URL || (window.location.origin + "/");
+    window.location.href = baseUrl + "search/" + encodeURIComponent(q);
+    return false;
+  };
+
+  function openSearchOverlay() {
+    var $overlay = $('#search-overlay');
+    if (!$overlay.length) return;
+    $overlay.addClass('is-open');
+    $('body').css('overflow', 'hidden');
+    // Focus input sau khi transition kết thúc (250ms)
+    setTimeout(function () {
+      $('#search-overlay-input').trigger('focus');
+    }, 260);
+  }
+
+  function closeSearchOverlay() {
+    $('#search-overlay').removeClass('is-open');
+    $('body').css('overflow', '');
+  }
+
+  /* =============================================================
      INIT
      ============================================================= */
   $(function () {
@@ -131,7 +160,7 @@
         listId:      '#article-list',
         doneMsgId:   '#load-done-msg',
         startOffset: 14,
-        batchSize:   8
+        batchSize:   8,
       });
     }
 
@@ -142,9 +171,31 @@
         listId:      '#page-article-list',
         doneMsgId:   '#page-load-done-msg',
         startOffset: 8,
-        batchSize:   8
+        batchSize:   8,
       });
     }
+
+    // Search overlay toggle
+    $('#btn-search').on('click', function () {
+      openSearchOverlay();
+    });
+
+    // Đóng overlay khi click backdrop
+    $('#search-backdrop').on('click', function () {
+      closeSearchOverlay();
+    });
+
+    // Đóng overlay khi click nút X
+    $('#btn-search-close').on('click', function () {
+      closeSearchOverlay();
+    });
+
+    // Đóng overlay khi nhấn Esc
+    $(document).on('keydown', function (e) {
+      if (e.key === 'Escape' && $('#search-overlay').hasClass('is-open')) {
+        closeSearchOverlay();
+      }
+    });
   });
 
 })(jQuery);
