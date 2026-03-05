@@ -6,11 +6,15 @@ RUN apk add --no-cache \
     libjpeg-turbo-dev \
     freetype-dev \
     zip \
-    libzip-dev
+    libzip-dev \
+    tzdata
 
 # Configure and install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd zip
+
+# Set PHP timezone
+RUN echo "date.timezone=Asia/Ho_Chi_Minh" > /usr/local/etc/php/conf.d/timezone.ini
 
 # Set working directory
 WORKDIR /var/www/html

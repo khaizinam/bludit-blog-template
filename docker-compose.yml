@@ -7,7 +7,7 @@ services:
     volumes:
       - ./public_html:/var/www/html
     environment:
-      - TZ=UTC
+      - TZ=Asia/Ho_Chi_Minh
     networks:
       - bludit_network
 
@@ -21,6 +21,8 @@ services:
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - app
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
     networks:
       - bludit_network
 
