@@ -2,12 +2,8 @@
 // --- Prepare data for internal link sections ---
 
 // Latest 5 posts
-$latestPosts = [];
 $publishedKeys = $pages->getPublishedDB();
 $latestKeys = array_slice($publishedKeys, 0, 5);
-foreach ($latestKeys as $lk) {
-    $latestPosts[] = new Page($lk);
-}
 
 // Related posts (same category, exclude current, max 4)
 $relatedPosts = [];
@@ -24,10 +20,36 @@ if ($currentCat) {
 // All posts count for load-more
 $allPublishedCount = count($publishedKeys);
 $pageLoadMoreOffset = 8; // first 8 shown statically below
+
+$stickyPages = [];
+foreach ($pages->db as $key => $fields) {
+    if ($fields['type'] === 'sticky') {
+        $p = new Page($key);
+        $stickyPages[] = $p;
+    }
+}
 ?>
-
+<div class="breaking-bar">
+    <div class="container d-flex align-items-stretch" style="max-width:80rem;">
+        <div class="breaking-label">CHÚ Ý</div>
+        <div class="breaking-ticker">
+            <marquee behavior="scroll" direction="left"
+                        onmouseover="this.stop();" onmouseout="this.start();">
+                <?php if (empty($stickyPages)): ?>
+                    Chào mừng bạn đến với <?php echo $site->title(); ?> &nbsp;·&nbsp; Chúc bạn một ngày tốt lành &nbsp;·&nbsp;
+                <?php else: ?>
+                    <?php foreach ($stickyPages as $sp): ?>
+                        <a href="<?php echo $sp->permalink(); ?>">
+                            <?php echo $sp->title(); ?>
+                        </a>
+                        <span class="mx-4" style="color:#cbd5e1;">&nbsp;·&nbsp;</span>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </marquee>
+        </div>
+    </div>
+</div>
 <article class="article-page px-3">
-
     <!-- Post Header -->
     <header>
         <?php if (!$page->isStatic()): ?>
@@ -36,7 +58,7 @@ $pageLoadMoreOffset = 8; // first 8 shown statically below
             </time>
         <?php endif; ?>
 
-        <h1 class="article-page-title"><?php echo $page->title(); ?></h1>
+        <h2 class="article-page-title"><?php echo $page->title(); ?></h2>
 
         <?php if ($page->description()): ?>
             <p class="article-page-desc"><?php echo $page->description(); ?></p>
@@ -66,32 +88,6 @@ $pageLoadMoreOffset = 8; // first 8 shown statically below
      FIX #5 — Internal link sections (SEO internal linking)
      ================================================================ -->
 <div class="container" style="max-width:768px; margin:0 auto;">
-
-    <!-- Section A: Bài mới nhất -->
-    <?php if (!empty($latestPosts)): ?>
-    <div class="page-sidebar-section">
-        <h2 class="section-heading">Bài viết mới nhất</h2>
-        <div>
-            <?php foreach ($latestPosts as $lp): ?>
-            <div class="latest-post-item">
-                <a href="<?php echo $lp->permalink(); ?>" class="flex-shrink-0">
-                    <img src="<?php echo $lp->coverImage() ?: DOMAIN_THEME_IMG.'place-holder.png'; ?>"
-                         onerror="this.onerror=null;this.src='<?php echo DOMAIN_THEME_IMG.'place-holder.png'; ?>';"
-                         alt="<?php echo $lp->title(); ?>"
-                         class="latest-post-thumb">
-                </a>
-                <div>
-                    <a href="<?php echo $lp->permalink(); ?>" class="latest-post-title">
-                        <?php echo $lp->title(); ?>
-                    </a>
-                    <div class="latest-post-date"><?php echo $lp->date(); ?></div>
-                </div>
-            </div>
-            <?php endforeach; ?>
-        </div>
-    </div>
-    <?php endif; ?>
-
     <!-- Section B: Bài viết liên quan -->
     <?php if (!empty($relatedPosts)): ?>
     <div class="page-sidebar-section">

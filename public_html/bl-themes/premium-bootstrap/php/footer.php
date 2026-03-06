@@ -66,19 +66,6 @@
         <div class="footer-bottom d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
             <div><?php echo $site->footer(); ?></div>
             <div class="d-flex align-items-center gap-4">
-                <?php if (!defined('BLUDIT_PRO')): ?>
-                    <div class="d-flex align-items-center gap-2">
-                        <img class="bludit-logo"
-                             src="<?php echo DOMAIN_THEME_IMG.'favicon.png'; ?>"
-                             alt="Bludit">
-                        <span>Powered by
-                            <a href="https://www.bludit.com" target="_blank" rel="noopener"
-                               style="color:var(--primary-600);text-decoration:underline;text-underline-offset:4px;">
-                                BLUDIT
-                            </a>
-                        </span>
-                    </div>
-                <?php endif; ?>
                 <span>Copyright &copy; <?php echo date('Y'); ?> <?php echo $site->title(); ?></span>
             </div>
         </div>

@@ -96,36 +96,6 @@ foreach ($pages->db as $key => $fields) {
 
         </div>
     </section>
-
-    <!-- SECTION 3 — MỚI NHẤT (6 bài) -->
-    <section class="container" style="max-width:80rem;">
-        <h2 class="section-heading">Mới nhất</h2>
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            <?php for ($i = 0; $i < 6; $i++): if (isset($allPages[$i])): $pi = $allPages[$i]; ?>
-            <div class="col">
-                <article class="article-card">
-                    <a href="<?php echo $pi->permalink(); ?>" class="d-block">
-                        <div class="article-card-img-wrap">
-                            <img src="<?php echo $pi->coverImage() ?: DOMAIN_THEME_IMG.'place-holder.png'; ?>"
-                                 alt="<?php echo $pi->title(); ?>"
-                                 onerror="this.onerror=null;this.src='<?php echo DOMAIN_THEME_IMG.'place-holder.png'; ?>';"
-                                 class="article-card-img">
-                        </div>
-                    </a>
-                    <div class="article-card-body">
-                        <span class="article-card-cat"><?php echo $pi->category(); ?></span>
-                        <a href="<?php echo $pi->permalink(); ?>" class="article-card-title d-block">
-                            <?php echo $pi->title(); ?>
-                        </a>
-                        <div class="meta-date mt-2"><?php echo $pi->date(); ?></div>
-                        <p class="article-card-desc"><?php echo $pi->description(); ?></p>
-                    </div>
-                </article>
-            </div>
-            <?php endif; endfor; ?>
-        </div>
-    </section>
-
     <!-- SECTION 4 — TẤT CẢ BÀI VIẾT + LOAD MORE -->
     <section class="container py-4" style="max-width:80rem;"
              data-total="<?php echo count($allPages); ?>">
@@ -133,8 +103,8 @@ foreach ($pages->db as $key => $fields) {
 
         <div id="article-list" class="mb-4">
             <?php
-            $start = 6;
-            $limit = 8;
+            $start = 0;
+            $limit = 6;
             for ($i = $start; $i < ($start + $limit); $i++):
                 if (isset($allPages[$i])): $pi = $allPages[$i];
             ?>

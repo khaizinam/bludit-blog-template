@@ -617,7 +617,7 @@ a:hover .footer-site-name { color: var(--primary-500); }
 #btn-page-load-more:hover { background: var(--accent); color: #fff; }
 #btn-page-load-more:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.article-page header { text-align: center; margin-bottom: 3rem; }
+.article-page header { text-align: start; margin-bottom: 3rem; }
 
 .article-page-date {
   font-size: 0.8rem;
