@@ -64,9 +64,14 @@
 
         <!-- Bottom bar -->
         <div class="footer-bottom d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
-            <div><?php echo $site->footer(); ?></div>
+            <div class="text-center text-md-start">
+                <div class="d-flex flex-wrap justify-content-center justify-content-md-start gap-3 mb-2">
+                    <a href="https://manga18k.xyz" target="_blank" title="Manga18K - Đọc truyện miễn phí" class="text-decoration-none" style="color: var(--text-muted);">Manga18K - Đọc truyện miễn phí</a>
+                    <a href="https://khaizinam.io.vn" target="_blank" title="khaizinam" class="text-decoration-none" style="color: var(--text-muted);">khaizinam</a>
+                </div>
+            </div>
             <div class="d-flex align-items-center gap-4">
-                <span>Copyright &copy; <?php echo date('Y'); ?> <?php echo $site->title(); ?></span>
+                <span>Copyright &copy; <?php echo date("Y"); ?> <?php echo $site->title(); ?></span>
             </div>
         </div>
     </div>
