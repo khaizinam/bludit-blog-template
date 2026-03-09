@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Cổ Phiếu Ngân Hàng vs ETF vs Chứng Chỉ Quỹ</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@300;400;500;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:        #05060a;
+  --surface:   #0c0e15;
+  --surface2:  #121420;
+  --surface3:  #181b28;
+  --border:    rgba(255,255,255,.07);
+  --border2:   rgba(255,255,255,.12);
+  --text:      #e9ecf5;
+  --muted:     #606480;
+  --muted2:    #8588a0;
+  --gold:      #d4a843;
+  --gold-dim:  rgba(212,168,67,.15);
+  --green:     #3ddc84;
+  --green-dim: rgba(61,220,132,.12);
+  --red:       #ff5c5c;
+  --red-dim:   rgba(255,92,92,.12);
+  --blue:      #5b9cf6;
+  --blue-dim:  rgba(91,156,246,.12);
+  --amber:     #ffb347;
+}
+
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.65;
+  overflow-x: hidden;
+}
+
+/* ─── NOISE TEXTURE OVERLAY ─── */
+body::before {
+  content:'';
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity:.4;
+}
+
+/* ─── HERO ─── */
+.hero {
+  position: relative;
+  padding: 72px 64px 60px;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+  z-index: 1;
+}
+.hero-glow {
+  position:absolute; top:-120px; left:-80px;
+  width:600px; height:600px; border-radius:50%;
+  background: radial-gradient(circle, rgba(212,168,67,.08) 0%, transparent 65%);
+  pointer-events:none;
+}
+.hero-glow2 {
+  position:absolute; bottom:-200px; right:-100px;
+  width:500px; height:500px; border-radius:50%;
+  background: radial-gradient(circle, rgba(61,220,132,.05) 0%, transparent 65%);
+  pointer-events:none;
+}
+.hero-date {
+  font-family:'JetBrains Mono', monospace;
+  font-size:11px; letter-spacing:2.5px; text-transform:uppercase;
+  color:var(--muted2); margin-bottom:20px;
+  display:flex; align-items:center; gap:10px;
+}
+.hero-date::before { content:''; display:block; width:24px; height:1px; background:var(--gold); }
+.hero h1 {
+  font-family:'Cormorant Garamond', serif;
+  font-size:52px; font-weight:700; line-height:1.08;
+  color:var(--text); max-width:760px;
+}
+.hero h1 em { color:var(--gold); font-style:italic; }
+.hero-sub {
+  font-size:15px; color:var(--muted2); margin-top:16px;
+  max-width:580px; font-weight:300;
+}
+.hero-tags { display:flex; gap:8px; flex-wrap:wrap; margin-top:28px; }
+.htag {
+  padding:4px 12px; border-radius:3px;
+  font-family:'JetBrains Mono',monospace; font-size:10px;
+  letter-spacing:.8px; text-transform:uppercase;
+}
+.htag-bank  { background:rgba(212,168,67,.1); color:var(--gold); border:1px solid rgba(212,168,67,.25); }
+.htag-etf   { background:rgba(91,156,246,.1); color:var(--blue); border:1px solid rgba(91,156,246,.25); }
+.htag-fund  { background:rgba(61,220,132,.1); color:var(--green); border:1px solid rgba(61,220,132,.25); }
+.htag-date  { background:transparent; color:var(--muted); border:1px solid var(--border2); }
+
+/* ─── LAYOUT ─── */
+.page { max-width:1200px; margin:0 auto; padding:52px 28px; position:relative; z-index:1; }
+
+.section { margin-bottom:56px; }
+.sec-eyebrow {
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px; letter-spacing:3px; text-transform:uppercase;
+  color:var(--muted); margin-bottom:8px;
+  display:flex; align-items:center; gap:10px;
+}
+.sec-eyebrow::after { content:''; flex:1; height:1px; background:var(--border); }
+.sec-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:26px; font-weight:700;
+  margin-bottom:24px; color:var(--text);
+}
+
+/* ─── BANK CARDS ─── */
+.bank-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; }
+@media(max-width:1000px){ .bank-grid { grid-template-columns:repeat(3,1fr); } }
+@media(max-width:600px){ .bank-grid { grid-template-columns:1fr 1fr; } }
+
+.bank-card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:10px; overflow:hidden;
+  transition:transform .2s, border-color .2s;
+  cursor:default;
+}
+.bank-card:hover { transform:translateY(-4px); border-color:var(--border2); }
+
+.bc-head {
+  padding:14px 16px 12px;
+  border-bottom:1px solid var(--border);
+  position:relative;
+}
+.bc-ticker {
+  font-family:'JetBrains Mono',monospace;
+  font-size:20px; font-weight:700; letter-spacing:1px;
+}
+.bc-fullname { font-size:10px; color:var(--muted); margin-top:2px; }
+.bc-badge {
+  position:absolute; top:12px; right:12px;
+  width:8px; height:8px; border-radius:50%;
+}
+.badge-div { background:var(--green); box-shadow:0 0 8px var(--green); }
+.badge-nodiv { background:var(--muted); }
+.badge-partial { background:var(--amber); box-shadow:0 0 8px var(--amber); }
+
+.bc-body { padding:14px 16px; }
+.bc-stat { margin-bottom:8px; }
+.bc-stat-label {
+  font-size:10px; color:var(--muted);
+  font-family:'JetBrains Mono',monospace;
+  letter-spacing:.5px; text-transform:uppercase;
+}
+.bc-stat-value { font-size:13px; font-weight:600; margin-top:1px; }
+
+.bc-years {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:4px; margin-top:10px;
+}
+.bc-year { padding:5px 7px; border-radius:4px; text-align:center; font-size:11px; font-family:'JetBrains Mono',monospace; font-weight:500; }
+.yr-pos { background:var(--green-dim); color:var(--green); }
+.yr-neg { background:var(--red-dim); color:var(--red); }
+
+.div-tag {
+  display:inline-flex; align-items:center; gap:4px;
+  font-size:11px; padding:3px 8px; border-radius:3px;
+  margin-top:8px; font-family:'JetBrains Mono',monospace;
+}
+.div-cash { background:var(--green-dim); color:var(--green); }
+.div-stock { background:var(--gold-dim); color:var(--gold); }
+.div-both { background:var(--blue-dim); color:var(--blue); }
+.div-none { background:var(--red-dim); color:var(--red); }
+
+/* VCB gold, ACB blue, MBB green, TCB amber, BID muted */
+.bk-vcb .bc-ticker { color:#f5c842; }
+.bk-acb .bc-ticker { color:var(--blue); }
+.bk-mbb .bc-ticker { color:var(--green); }
+.bk-tcb .bc-ticker { color:var(--amber); }
+.bk-bid .bc-ticker { color:#a78bfa; }
+
+.bk-vcb { border-top:2px solid #f5c842; }
+.bk-acb { border-top:2px solid var(--blue); }
+.bk-mbb { border-top:2px solid var(--green); }
+.bk-tcb { border-top:2px solid var(--amber); }
+.bk-bid { border-top:2px solid #a78bfa; }
+
+/* ─── ETF / FUND SECTION ─── */
+.product-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px; }
+@media(max-width:760px){ .product-grid { grid-template-columns:1fr; } }
+
+.prod-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; overflow:hidden;
+  transition:transform .2s, border-color .2s;
+}
+.prod-card:hover { transform:translateY(-3px); border-color:var(--border2); }
+.prod-head {
+  padding:16px 18px; border-bottom:1px solid var(--border);
+  display:flex; align-items:flex-start; justify-content:space-between;
+}
+.prod-code {
+  font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:700;
+}
+.prod-name { font-size:11px; color:var(--muted); margin-top:3px; }
+.prod-type {
+  font-size:10px; padding:3px 8px; border-radius:3px;
+  font-family:'JetBrains Mono',monospace; letter-spacing:.5px;
+  white-space:nowrap;
+}
+.type-etf { background:var(--blue-dim); color:var(--blue); }
+.type-fund { background:var(--green-dim); color:var(--green); }
+
+.prod-body { padding:16px 18px; }
+.prod-row { display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid var(--border); font-size:12.5px; }
+.prod-row:last-child { border:none; }
+.prod-row .pl { color:var(--muted); }
+.prod-row .pv { font-weight:600; }
+
+.etf-vn30 { border-top:2px solid var(--blue); }
+.etf-vnfin { border-top:2px solid var(--amber); }
+.fund-ssisca { border-top:2px solid var(--green); }
+.etf-vn30 .prod-code { color:var(--blue); }
+.etf-vnfin .prod-code { color:var(--amber); }
+.fund-ssisca .prod-code { color:var(--green); }
+
+/* ─── CHARTS ─── */
+.chart-trio { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:16px; }
+.chart-duo  { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+.chart-full { margin-bottom:16px; }
+@media(max-width:900px){ .chart-trio,.chart-duo { grid-template-columns:1fr; } }
+
+.c-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; padding:20px;
+}
+.c-card h3 {
+  font-size:13px; font-weight:600; margin-bottom:14px; color:var(--text);
+  display:flex; align-items:center; gap:8px;
+}
+.c-card h3 .c-sub { font-size:11px; color:var(--muted); font-weight:400; font-family:'JetBrains Mono',monospace; }
+.c-box { position:relative; }
+.h200 { height:200px; }
+.h260 { height:260px; }
+.h320 { height:320px; }
+
+/* ─── MEGA TABLE ─── */
+.mega-table-wrap {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; overflow-x:auto; margin-bottom:16px;
+}
+.mega-table-wrap table { width:100%; min-width:860px; border-collapse:collapse; font-size:12px; }
+.mega-table-wrap thead th {
+  background:var(--surface2); color:var(--muted2);
+  padding:10px 13px; text-align:center; font-weight:500;
+  font-family:'JetBrains Mono',monospace; font-size:10px;
+  letter-spacing:.8px; text-transform:uppercase;
+  border-bottom:1px solid var(--border2);
+}
+.mega-table-wrap thead th:first-child { text-align:left; min-width:140px; }
+.mega-table-wrap tbody td {
+  padding:9px 13px; text-align:center;
+  border-bottom:1px solid var(--border);
+}
+.mega-table-wrap tbody td:first-child { text-align:left; color:var(--muted2); font-weight:500; }
+.mega-table-wrap tbody tr:hover td { background:var(--surface2); }
+.mega-table-wrap tbody tr:last-child td { border:none; }
+
+.pos { color:var(--green); font-weight:600; }
+.neg { color:var(--red); font-weight:600; }
+.gold-txt { color:var(--gold); font-weight:600; }
+.blue-txt { color:var(--blue); font-weight:600; }
+.muted-txt { color:var(--muted); }
+
+.sub-head {
+  background:var(--surface3) !important;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px !important; text-transform:uppercase;
+  letter-spacing:1px; color:var(--muted) !important;
+}
+.sub-head td { color:var(--muted) !important; font-size:10px !important; letter-spacing:1px; }
+
+/* ─── VERDICT CARDS ─── */
+.verdict-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
+@media(max-width:900px){ .verdict-grid { grid-template-columns:1fr 1fr; } }
+@media(max-width:500px){ .verdict-grid { grid-template-columns:1fr; } }
+
+.v-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; padding:18px 16px;
+}
+.v-icon { font-size:28px; margin-bottom:10px; }
+.v-title { font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:700; margin-bottom:6px; }
+.v-who { font-size:11px; color:var(--muted); margin-bottom:10px; font-style:italic; }
+.v-choice {
+  font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700;
+  padding:8px 12px; border-radius:5px; text-align:center; letter-spacing:.5px;
+  margin-bottom:8px;
+}
+.vc-bank { background:var(--gold-dim); color:var(--gold); }
+.vc-etf  { background:var(--blue-dim); color:var(--blue); }
+.vc-fund { background:var(--green-dim); color:var(--green); }
+.vc-mix  { background:rgba(255,255,255,.05); color:var(--text); }
+.v-why { font-size:12px; color:var(--muted); line-height:1.6; }
+
+/* ─── RISK MATRIX ─── */
+.risk-grid { display:grid; grid-template-columns:repeat(8,1fr); gap:8px; margin:16px 0; }
+@media(max-width:760px){ .risk-grid { grid-template-columns:repeat(4,1fr); } }
+
+.risk-cell {
+  aspect-ratio:1; border-radius:8px; display:flex;
+  flex-direction:column; align-items:center; justify-content:center;
+  border:1px solid var(--border); padding:6px 4px;
+  font-size:11px; text-align:center;
+}
+.risk-cell .r-code {
+  font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700;
+}
+.risk-cell .r-val { font-size:10px; margin-top:3px; }
+
+.r-low    { background:rgba(61,220,132,.08);  border-color:rgba(61,220,132,.2); }
+.r-mid    { background:rgba(255,179,71,.08);  border-color:rgba(255,179,71,.2); }
+.r-high   { background:rgba(255,92,92,.08);   border-color:rgba(255,92,92,.2); }
+
+/* ─── INSIGHT BOX ─── */
+.insight-strip {
+  background: linear-gradient(135deg, rgba(212,168,67,.06) 0%, rgba(91,156,246,.04) 100%);
+  border:1px solid rgba(212,168,67,.2); border-radius:10px;
+  padding:20px 24px; margin-bottom:24px;
+}
+.insight-strip h4 {
+  font-family:'Cormorant Garamond',serif;
+  font-size:17px; font-weight:700; color:var(--gold); margin-bottom:12px;
+}
+.insight-list { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+@media(max-width:640px){ .insight-list { grid-template-columns:1fr; } }
+.insight-item {
+  display:flex; gap:10px; align-items:flex-start;
+  font-size:13px; color:var(--muted2); line-height:1.6;
+}
+.insight-item .i-num {
+  font-family:'JetBrains Mono',monospace; font-size:11px;
+  color:var(--gold); font-weight:700; flex-shrink:0; margin-top:2px;
+}
+
+/* ─── DISCLAIMER ─── */
+.disclaimer {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:8px; padding:16px 20px; font-size:11px;
+  color:var(--muted); line-height:1.7; margin-top:40px;
+}
+.disclaimer strong { color:var(--muted2); }
+
+footer {
+  text-align:center; padding:28px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px; letter-spacing:1px; text-transform:uppercase;
+  color:var(--muted); border-top:1px solid var(--border);
+  position:relative; z-index:1;
+}
+
+/* ─── DIVIDER ─── */
+.div-line {
+  height:1px; background: linear-gradient(90deg, transparent, var(--border2), transparent);
+  margin:40px 0;
+}
+
+/* ─── ANIMATE IN ─── */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.hero h1, .hero-sub, .hero-tags { animation: fadeUp .6s ease both; }
+.hero-sub { animation-delay:.1s; }
+.hero-tags { animation-delay:.2s; }
+</style>
+</head>
+<body>
+
+<!-- ═══ HERO ═══ -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-date">Báo cáo phân tích tài chính — 09 / 03 / 2026</div>
+  <h1>Cổ Phiếu <em>Ngân Hàng</em><br>vs ETF vs Chứng Chỉ Quỹ</h1>
+  <p class="hero-sub">So sánh toàn diện Top 5 cổ phiếu ngân hàng Việt Nam có cổ tức đều đặn với các quỹ ETF VN30, VNFIN LEAD và chứng chỉ quỹ chủ động hàng đầu.</p>
+  <div class="hero-tags">
+    <span class="htag htag-bank">🏦 Cổ phiếu NH</span>
+    <span class="htag htag-etf">📊 ETF</span>
+    <span class="htag htag-fund">📁 Chứng chỉ quỹ</span>
+    <span class="htag htag-date">Giai đoạn 2021–2025</span>
+    <span class="htag htag-date">Nguồn: SSI, DCVFM, HOSE, Bloomberg</span>
+  </div>
+</div>
+
+<div class="page">
+
+<!-- ═══ I. TOP 5 CỔ PHIẾU NGÂN HÀNG ═══ -->
+<div class="section">
+  <div class="sec-eyebrow">Phần I</div>
+  <div class="sec-title">Top 5 Cổ Phiếu Ngân Hàng — Hiệu suất & Cổ tức</div>
+
+  <div class="bank-grid">
+
+    <!-- VCB -->
+    <div class="bank-card bk-vcb">
+      <div class="bc-head">
+        <div class="bc-ticker">VCB</div>
+        <div class="bc-fullname">Vietcombank</div>
+        <div class="bc-badge badge-partial" title="Cổ tức chủ yếu cổ phiếu"></div>
+      </div>
+      <div class="bc-body">
+        <div class="bc-stat">
+          <div class="bc-stat-label">Giá T3/2026</div>
+          <div class="bc-stat-value">~82.000–85.000đ</div>
+        </div>
+        <div class="bc-stat">
+          <div class="bc-stat-label">Cổ tức/năm</div>
+          <div class="bc-stat-value">12–18% mệnh giá</div>
+        </div>
+        <div class="bc-stat">
+          <div class="bc-stat-label">5Y CAGR giá</div>
+          <div class="bc-stat-value pos">~12–14%</div>
+        </div>
+        <div class="bc-stat">
+          <div class="bc-stat-label">ROE</div>
+          <div class="bc-stat-value">~22% / năm</div>
+        </div>
+        <div class="bc-years">
+          <div class="bc-year yr-pos">2021: +28%</div>
+          <div class="bc-year yr-neg">2022: −20%</div>
+          <div class="bc-year yr-pos">2023: +15%</div>
+          <div class="bc-year yr-pos">2024: +8%</div>
+        </div>
+        <div class="div-tag div-stock">⚠️ Chủ yếu CP</div>
+      </div>
+    </div>
+
+    <!-- ACB -->
+    <div class="bank-card bk-acb">
+      <div class="bc-head">
+        <div class="bc-ticker">ACB</div>
+        <div class="bc-fullname">Ngân hàng Á Châu</div>
+        <div class="bc-badge badge-div" title="Cổ tức tiền mặt + cổ phiếu"></div>
+      </div>
+      <div class="bc-body">
+        <div class="bc-stat">
+          <div class="bc-stat-label">Giá T3/2026</div>
+          <div class="bc-stat-value">~24.000–26.000đ</div>
+        </div>
+        <div class="bc-stat">
+          <div class="bc-stat-label">Cổ tức/năm</div>
+          <div class="bc-stat-value">10–15% mệnh giá</div>
+        </div>
+        <div class="bc-stat">
+          <div class="bc-stat-label">5Y CAGR giá</div>
+          <div class="bc-stat-value pos">~18–20%</div>
+        </div>
+        <div class="bc-stat">
+          <div class="bc-stat-label">NPL</div>
+          <div class="bc-stat-value pos">Thấp nhất ngành</div>
+        </div>
+        <div class="bc-years">
+          <div class="bc-year yr-pos">2021: +60%</div>
+          <div class="bc-year yr-neg">2022: −35%</div>
+          <div class="bc-year yr-pos">2023: +22%</div>
+          <div class="bc-year yr-pos">2024: +18%</div>
+        </div>
+        <div class="div-tag div-both">✅ Tiền mặt + CP</div>
+      </div>
+    </div>
+
+    <!-- MBB -->
+    <div class="bank-card bk-mbb">
+      <div class="bc-head">
+        <div class="bc-ticker">MBB</div>
+        <div class="bc-fullname">MB Bank</div>
+        <div class="bc-badge badge-partial" title="Chủ yếu cổ phiếu thưởng"></div>
+      </div>
+      <div class="bc-body">
+        <div class="bc-stat">
+          <div class="bc-stat-label">Giá T3/2026</div>
+          <div class="bc-stat-value">~22.000–24.000đ</div>
+        </div>
+        <div class="bc-stat">
+          <div class="bc-stat-label">Cổ tức/năm</div>
+          <div class="bc-stat-value">10–15% mệnh giá</div>
+        </div>
+        <div class="bc-stat">
+          <div class="bc-stat-label">5Y CAGR giá</div>
+          <div class="bc-stat-value pos">~20–22%</div>
+        </div>
+        <div class="bc-stat">
+          <div class="bc-stat-label">Hệ sinh thái</div>
+          <div class="bc-stat-value">MCredit · MB Ageas</div>
+        </div>
+        <div class="bc-years">
+          <div class="bc-year yr-pos">2021: +72%</div>
+          <div class="bc-year yr-neg">2022: −42%</div>
+          <div class="bc-year yr-pos">2023: +20%</div>
+          <div class="bc-year yr-pos">2024: +15%</div>
+        </div>
+        <div class="div-tag div-stock">⚠️ Chủ yếu CP thưởng</div>
+      </div>
+    </div>
+
+    <!-- TCB -->
+    <div class="bank-card bk-tcb">
+      <div class="bc-head">
+        <div class="bc-ticker">TCB</div>
+        <div class="bc-fullname">Techcombank</div>
+        <div class="bc-badge badge-nodiv" title="Không trả cổ tức"></div>
+      </div>
+      <div class="bc-body">
+        <div class="bc-stat">
+          <div class="bc-stat-label">Giá T3/2026</div>
+          <div class="bc-stat-value">~26.000–28.000đ</div>
+        </div>
+        <div class="bc-stat">
+          <div class="bc-stat-label">Cổ tức/năm</div>
+          <div class="bc-stat-value neg">❌ Không trả</div>
+        </div>
+        <div class="bc-stat">
+          <div class="bc-stat-label">5Y CAGR giá</div>
+          <div class="bc-stat-value pos">~18–22%</div>
+        </div>
+        <div class="bc-stat">
+          <div class="bc-stat-label">CASA</div>
+          <div class="bc-stat-value gold-txt">Cao nhất ngành</div>
+        </div>
+        <div class="bc-years">
+          <div class="bc-year yr-pos">2021: +75%</div>
+          <div class="bc-year yr-neg">2022: −50%</div>
+          <div class="bc-year yr-pos">2023: +35%</div>
+          <div class="bc-year yr-pos">2024: +20%</div>
+        </div>
+        <div class="div-tag div-none">❌ Không cổ tức</div>
+      </div>
+    </div>
+
+    <!-- BID -->
+    <div class="bank-card bk-bid">
+      <div class="bc-head">
+        <div class="bc-ticker">BID</div>
+        <div class="bc-fullname">BIDV</div>
+        <div class="bc-badge badge-div" title="Trả tiền mặt đều đặn nhất"></div>
+      </div>
+      <div class="bc-body">
+        <div class="bc-stat">
+          <div class="bc-stat-label">Giá T3/2026</div>
+          <div class="bc-stat-value">~44.000–47.000đ</div>
+        </div>
+        <div class="bc-stat">
+          <div class="bc-stat-label">Cổ tức/năm</div>
+          <div class="bc-stat-value">5–12% mệnh giá</div>
+        </div>
+        <div class="bc-stat">
+          <div class="bc-stat-label">5Y CAGR giá</div>
+          <div class="bc-stat-value pos">~14–16%</div>
+        </div>
+        <div class="bc-stat">
+          <div class="bc-stat-label">Tổng tài sản</div>
+          <div class="bc-stat-value">Lớn nhất ngành</div>
+        </div>
+        <div class="bc-years">
+          <div class="bc-year yr-pos">2021: +35%</div>
+          <div class="bc-year yr-neg">2022: −25%</div>
+          <div class="bc-year yr-pos">2023: +18%</div>
+          <div class="bc-year yr-pos">2024: +12%</div>
+        </div>
+        <div class="div-tag div-cash">💰 Tiền mặt đều đặn</div>
+      </div>
+    </div>
+
+  </div><!-- /bank-grid -->
+
+  <!-- Legend -->
+  <div style="display:flex;gap:20px;margin-top:12px;font-size:11px;color:var(--muted);flex-wrap:wrap">
+    <span>🟢 Chấm xanh = cổ tức tiền mặt đều đặn</span>
+    <span>🟡 Chấm vàng = cổ tức chủ yếu cổ phiếu</span>
+    <span>⚫ Chấm xám = không trả cổ tức</span>
+  </div>
+</div>
+
+<div class="div-line"></div>
+
+<!-- ═══ II. ETF & QUỸ MỞ ═══ -->
+<div class="section">
+  <div class="sec-eyebrow">Phần II</div>
+  <div class="sec-title">Quỹ ETF & Chứng Chỉ Quỹ Tiêu Biểu</div>
+
+  <div class="product-grid">
+
+    <!-- E1VFVN30 -->
+    <div class="prod-card etf-vn30">
+      <div class="prod-head">
+        <div>
+          <div class="prod-code">E1VFVN30</div>
+          <div class="prod-name">DCVFM VN30 — Dragon Capital</div>
+        </div>
+        <span class="prod-type type-etf">ETF · VN30</span>
+      </div>
+      <div class="prod-body">
+        <div class="prod-row"><span class="pl">Thành lập</span><span class="pv">06/10/2014</span></div>
+        <div class="prod-row"><span class="pl">NAV</span><span class="pv">~7.000–8.000 tỷ VND</span></div>
+        <div class="prod-row"><span class="pl">Phí TER</span><span class="pv">~0.65%/năm</span></div>
+        <div class="prod-row"><span class="pl">Cổ tức</span><span class="pv neg">❌ Không trả</span></div>
+        <div class="prod-row"><span class="pl">2021</span><span class="pv pos">+43.8%</span></div>
+        <div class="prod-row"><span class="pl">2022</span><span class="pv neg">−32.2%</span></div>
+        <div class="prod-row"><span class="pl">2023</span><span class="pv pos">+12.7%</span></div>
+        <div class="prod-row"><span class="pl">2024</span><span class="pv pos">+20.6%</span></div>
+        <div class="prod-row"><span class="pl">5Y CAGR</span><span class="pv pos">~15–18%</span></div>
+        <div class="prod-row"><span class="pl">Tracking err</span><span class="pv pos">&lt;0.5%</span></div>
+      </div>
+    </div>
+
+    <!-- FUESSVFL -->
+    <div class="prod-card etf-vnfin">
+      <div class="prod-head">
+        <div>
+          <div class="prod-code">FUESSVFL</div>
+          <div class="prod-name">SSIAM VNFIN LEAD — SSI</div>
+        </div>
+        <span class="prod-type type-etf">ETF · VNFIN</span>
+      </div>
+      <div class="prod-body">
+        <div class="prod-row"><span class="pl">Thành lập</span><span class="pv">10/11/2020</span></div>
+        <div class="prod-row"><span class="pl">NAV</span><span class="pv">~400–500 tỷ VND</span></div>
+        <div class="prod-row"><span class="pl">Phí TER</span><span class="pv">~0.8%/năm</span></div>
+        <div class="prod-row"><span class="pl">Cổ tức</span><span class="pv neg">❌ Không trả</span></div>
+        <div class="prod-row"><span class="pl">2021</span><span class="pv pos">+47–50%</span></div>
+        <div class="prod-row"><span class="pl">2022</span><span class="pv neg">−38–40%</span></div>
+        <div class="prod-row"><span class="pl">2023</span><span class="pv pos">+18%</span></div>
+        <div class="prod-row"><span class="pl">2024</span><span class="pv pos">+22–25%</span></div>
+        <div class="prod-row"><span class="pl">5Y CAGR</span><span class="pv pos">~17–19%</span></div>
+        <div class="prod-row"><span class="pl">Rủi ro</span><span class="pv neg">Cao (100% NH)</span></div>
+      </div>
+    </div>
+
+    <!-- SSISCA -->
+    <div class="prod-card fund-ssisca">
+      <div class="prod-head">
+        <div>
+          <div class="prod-code">SSISCA</div>
+          <div class="prod-name">SSI Sustainable Competitive Advantage</div>
+        </div>
+        <span class="prod-type type-fund">Quỹ mở chủ động</span>
+      </div>
+      <div class="prod-body">
+        <div class="prod-row"><span class="pl">Thành lập</span><span class="pv">26/09/2014</span></div>
+        <div class="prod-row"><span class="pl">Chiến lược</span><span class="pv">Chủ động · Lợi thế bền vững</span></div>
+        <div class="prod-row"><span class="pl">Phí QT</span><span class="pv">~1.5%/năm</span></div>
+        <div class="prod-row"><span class="pl">Cổ tức</span><span class="pv neg">❌ Không trả</span></div>
+        <div class="prod-row"><span class="pl">2021</span><span class="pv pos">~+45%</span></div>
+        <div class="prod-row"><span class="pl">2022</span><span class="pv neg">~−25%</span></div>
+        <div class="prod-row"><span class="pl">2023</span><span class="pv pos">+31.7%</span></div>
+        <div class="prod-row"><span class="pl">2024</span><span class="pv pos">+33.5%</span></div>
+        <div class="prod-row"><span class="pl">5Y CAGR</span><span class="pv pos">~20–22%</span></div>
+        <div class="prod-row"><span class="pl">Đặc điểm</span><span class="pv gold-txt">Vượt VN30 liên tục</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="div-line"></div>
+
+<!-- ═══ III. CHARTS ═══ -->
+<div class="section">
+  <div class="sec-eyebrow">Phần III</div>
+  <div class="sec-title">Biểu Đồ Hiệu Suất So Sánh</div>
+
+  <div class="chart-duo">
+    <div class="c-card">
+      <h3>Hiệu suất hàng năm — Cổ phiếu NH <span class="c-sub">2021–2024</span></h3>
+      <div class="c-box h260"><canvas id="chBank"></canvas></div>
+    </div>
+    <div class="c-card">
+      <h3>Hiệu suất hàng năm — ETF & Quỹ <span class="c-sub">2021–2024</span></h3>
+      <div class="c-box h260"><canvas id="chFund"></canvas></div>
+    </div>
+  </div>
+
+  <div class="chart-duo">
+    <div class="c-card">
+      <h3>So sánh 5Y CAGR — Tất cả sản phẩm <span class="c-sub">%/năm ước tính</span></h3>
+      <div class="c-box h260"><canvas id="chCAGR"></canvas></div>
+    </div>
+    <div class="c-card">
+      <h3>Tăng trưởng tích lũy — 100 triệu từ đầu 2021 <span class="c-sub">triệu đồng</span></h3>
+      <div class="c-box h260"><canvas id="chCumul"></canvas></div>
+    </div>
+  </div>
+
+  <div class="c-card chart-full">
+    <h3>Drawdown tệ nhất (2022) vs Phục hồi tốt nhất (2023+2024) <span class="c-sub">%</span></h3>
+    <div class="c-box h200"><canvas id="chRisk"></canvas></div>
+  </div>
+</div>
+
+<div class="div-line"></div>
+
+<!-- ═══ IV. MEGA TABLE ═══ -->
+<div class="section">
+  <div class="sec-eyebrow">Phần IV</div>
+  <div class="sec-title">Bảng So Sánh Toàn Diện</div>
+
+  <div class="mega-table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Tiêu chí</th>
+          <th style="color:#f5c842">VCB</th>
+          <th style="color:var(--blue)">ACB</th>
+          <th style="color:var(--green)">MBB</th>
+          <th style="color:var(--amber)">TCB</th>
+          <th style="color:#a78bfa">BID</th>
+          <th style="color:var(--blue)">E1VFVN30</th>
+          <th style="color:var(--amber)">FUESSVFL</th>
+          <th style="color:var(--green)">SSISCA</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="sub-head"><td colspan="9">📌 Thông tin cơ bản</td></tr>
+        <tr>
+          <td>Loại tài sản</td>
+          <td colspan="5" style="color:var(--gold);font-weight:600;text-align:center">Cổ phiếu riêng lẻ</td>
+          <td colspan="2" style="color:var(--blue);font-weight:600;text-align:center">ETF niêm yết</td>
+          <td style="color:var(--green);font-weight:600">Quỹ mở</td>
+        </tr>
+        <tr>
+          <td>Số CP trong danh mục</td>
+          <td>1</td><td>1</td><td>1</td><td>1</td><td>1</td>
+          <td>30</td><td>10</td><td>15–25</td>
+        </tr>
+        <tr>
+          <td>Rủi ro tập trung</td>
+          <td class="neg">Rất cao</td><td class="neg">Rất cao</td><td class="neg">Rất cao</td><td class="neg">Rất cao</td><td class="neg">Rất cao</td>
+          <td style="color:var(--amber)">Trung bình</td><td class="neg">Cao</td><td class="pos">Thấp–TB</td>
+        </tr>
+        <tr class="sub-head"><td colspan="9">💰 Cổ tức & Thu nhập</td></tr>
+        <tr>
+          <td>Cổ tức/năm</td>
+          <td style="color:var(--amber)">12–18% MG</td>
+          <td class="pos">10–15% MG</td>
+          <td style="color:var(--amber)">10–15% MG</td>
+          <td class="neg">❌ Không</td>
+          <td class="pos">5–12% MG</td>
+          <td class="neg">❌</td><td class="neg">❌</td><td class="neg">❌</td>
+        </tr>
+        <tr>
+          <td>Hình thức cổ tức</td>
+          <td style="color:var(--amber)">Chủ yếu CP</td>
+          <td class="pos">Tiền mặt + CP</td>
+          <td style="color:var(--amber)">Chủ yếu CP</td>
+          <td class="neg">Không</td>
+          <td class="pos">💰 Tiền mặt</td>
+          <td class="muted-txt">—</td><td class="muted-txt">—</td><td class="muted-txt">—</td>
+        </tr>
+        <tr>
+          <td>Thuế cổ tức TNCN (5%)</td>
+          <td class="neg">Có</td><td class="neg">Có</td><td class="neg">Có</td><td class="pos">Không</td><td class="neg">Có</td>
+          <td class="pos">Không</td><td class="pos">Không</td><td class="pos">Không</td>
+        </tr>
+        <tr class="sub-head"><td colspan="9">📈 Hiệu suất đầu tư</td></tr>
+        <tr>
+          <td>2021 return</td>
+          <td class="pos">+28%</td><td class="pos">+60%</td><td class="pos">+72%</td><td class="pos">+75%</td><td class="pos">+35%</td>
+          <td class="pos">+43.8%</td><td class="pos">+47–50%</td><td class="pos">~+45%</td>
+        </tr>
+        <tr>
+          <td>2022 return</td>
+          <td class="neg">−20%</td><td class="neg">−35%</td><td class="neg">−42%</td><td class="neg">−50%</td><td class="neg">−25%</td>
+          <td class="neg">−32.2%</td><td class="neg">−38–40%</td><td class="neg">~−25%</td>
+        </tr>
+        <tr>
+          <td>2023 return</td>
+          <td class="pos">+15%</td><td class="pos">+22%</td><td class="pos">+20%</td><td class="pos">+35%</td><td class="pos">+18%</td>
+          <td class="pos">+12.7%</td><td class="pos">+18%</td><td class="pos gold-txt">+31.7%</td>
+        </tr>
+        <tr>
+          <td>2024 return</td>
+          <td class="pos">+8%</td><td class="pos">+18%</td><td class="pos">+15%</td><td class="pos">+20%</td><td class="pos">+12%</td>
+          <td class="pos">+20.6%</td><td class="pos">+22–25%</td><td class="pos gold-txt">+33.5%</td>
+        </tr>
+        <tr>
+          <td>5Y CAGR giá (ước)</td>
+          <td>~12–14%</td><td class="pos">~18–20%</td><td class="pos">~20–22%</td><td class="pos">~18–22%</td><td>~14–16%</td>
+          <td class="pos">~15–18%</td><td class="pos">~17–19%</td><td class="pos gold-txt">~20–22%</td>
+        </tr>
+        <tr class="sub-head"><td colspan="9">⚙️ Chi phí & Vận hành</td></tr>
+        <tr>
+          <td>Phí quản lý/năm</td>
+          <td class="pos">Chỉ phí GD</td><td class="pos">Chỉ phí GD</td><td class="pos">Chỉ phí GD</td><td class="pos">Chỉ phí GD</td><td class="pos">Chỉ phí GD</td>
+          <td class="pos">0.65% TER</td><td style="color:var(--amber)">0.8% TER</td><td class="neg">~1.5%/năm</td>
+        </tr>
+        <tr>
+          <td>Tần suất giao dịch</td>
+          <td colspan="5" style="text-align:center">Liên tục T2–T6</td>
+          <td colspan="2" style="text-align:center">Liên tục T2–T6</td>
+          <td>Hàng tuần (T3)</td>
+        </tr>
+        <tr>
+          <td>Đầu tư tối thiểu</td>
+          <td colspan="5" style="text-align:center">100 CP × giá thị trường</td>
+          <td colspan="2" style="text-align:center">100 ccq × giá (~2–3 triệu)</td>
+          <td>1–2 triệu đồng</td>
+        </tr>
+        <tr>
+          <td>Mức độ theo dõi cần thiết</td>
+          <td class="neg">Nhiều</td><td class="neg">Nhiều</td><td class="neg">Nhiều</td><td class="neg">Nhiều</td><td style="color:var(--amber)">Trung bình</td>
+          <td class="pos">Rất ít</td><td class="pos">Ít</td><td class="pos">Rất ít</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="div-line"></div>
+
+<!-- ═══ V. MA TRẬN RỦI RO ═══ -->
+<div class="section">
+  <div class="sec-eyebrow">Phần V</div>
+  <div class="sec-title">Ma Trận Rủi Ro — Drawdown 2022</div>
+  <p style="color:var(--muted);font-size:13px;margin-bottom:16px">Năm 2022 là bài kiểm tra khắc nghiệt nhất. Màu sắc thể hiện mức độ thiệt hại: 🟢 thấp · 🟡 trung bình · 🔴 cao</p>
+
+  <div class="risk-grid">
+    <div class="risk-cell r-low">
+      <div class="r-code" style="color:#f5c842">VCB</div>
+      <div class="r-val pos">−20%</div>
+      <div class="r-val" style="font-size:9px;color:var(--muted)">Ít nhất</div>
+    </div>
+    <div class="risk-cell r-mid">
+      <div class="r-code" style="color:#a78bfa">BID</div>
+      <div class="r-val" style="color:var(--amber)">−25%</div>
+    </div>
+    <div class="risk-cell r-mid">
+      <div class="r-code" style="color:var(--green)">SSISCA</div>
+      <div class="r-val" style="color:var(--amber)">~−25%</div>
+      <div class="r-val" style="font-size:9px;color:var(--muted)">Phòng thủ tốt</div>
+    </div>
+    <div class="risk-cell r-mid">
+      <div class="r-code" style="color:var(--blue)">ACB</div>
+      <div class="r-val neg">−35%</div>
+    </div>
+    <div class="risk-cell r-high">
+      <div class="r-code" style="color:var(--blue)">E1VFVN30</div>
+      <div class="r-val neg">−32%</div>
+    </div>
+    <div class="risk-cell r-high">
+      <div class="r-code" style="color:var(--amber)">FUESSVFL</div>
+      <div class="r-val neg">~−39%</div>
+    </div>
+    <div class="risk-cell r-high">
+      <div class="r-code" style="color:var(--green)">MBB</div>
+      <div class="r-val neg">−42%</div>
+    </div>
+    <div class="risk-cell r-high" style="background:rgba(255,92,92,.15)">
+      <div class="r-code" style="color:var(--amber)">TCB</div>
+      <div class="r-val neg">−50%</div>
+      <div class="r-val" style="font-size:9px;color:var(--muted)">Nhiều nhất</div>
+    </div>
+  </div>
+</div>
+
+<div class="div-line"></div>
+
+<!-- ═══ VI. INSIGHTS ═══ -->
+<div class="section">
+  <div class="sec-eyebrow">Phần VI</div>
+  <div class="sec-title">Phân Tích Chuyên Sâu</div>
+
+  <div class="insight-strip">
+    <h4>📌 6 Điểm nhấn quan trọng cho nhà đầu tư Việt Nam</h4>
+    <div class="insight-list">
+      <div class="insight-item">
+        <span class="i-num">①</span>
+        <span><strong style="color:var(--text)">ACB và MBB có tổng return thực tế cao nhất</strong> khi tính cả cổ tức tái đầu tư — CAGR 5 năm có thể đạt 22–25%. Tuy nhiên biến động rất mạnh, không phù hợp NĐT mới hoặc không chịu được tâm lý thua lỗ.</span>
+      </div>
+      <div class="insight-item">
+        <span class="i-num">②</span>
+        <span><strong style="color:var(--text)">SSISCA là sản phẩm quản lý tài sản xuất sắc nhất 2023–2024</strong> — vượt VN30 Index liên tục, phòng thủ tốt năm 2022. Đây là lựa chọn tốt nhất nếu bạn tin tưởng đội ngũ quản lý chủ động.</span>
+      </div>
+      <div class="insight-item">
+        <span class="i-num">③</span>
+        <span><strong style="color:var(--text)">ETF và quỹ mở KHÔNG trả cổ tức tiền mặt</strong> — toàn bộ lợi nhuận tái đầu tư vào NAV. Nếu cần dòng tiền định kỳ, chỉ có cổ phiếu BID và ACB mới đáp ứng được nhu cầu này.</span>
+      </div>
+      <div class="insight-item">
+        <span class="i-num">④</span>
+        <span><strong style="color:var(--text)">Cổ tức cổ phiếu ≠ cổ tức tiền mặt.</strong> VCB và MBB trả chủ yếu bằng cổ phiếu thưởng (pha loãng CP), không tạo dòng tiền thực. BID là ngân hàng quốc doanh trả tiền mặt đều đặn nhất.</span>
+      </div>
+      <div class="insight-item">
+        <span class="i-num">⑤</span>
+        <span><strong style="color:var(--text)">Thuế cổ tức 5% TNCN</strong> ảnh hưởng trực tiếp đến lợi nhuận thực nhận. ETF và quỹ mở không chịu thuế này vì không phát cổ tức — lợi thế dài hạn 5–10 năm là đáng kể.</span>
+      </div>
+      <div class="insight-item">
+        <span class="i-num">⑥</span>
+        <span><strong style="color:var(--text)">TCB là con dao hai lưỡi:</strong> không cổ tức, biến động mạnh nhất (+75% năm 2021 nhưng −50% năm 2022). Chỉ phù hợp NĐT có kinh nghiệm, chấp nhận rủi ro cao và đầu tư ít nhất 3–5 năm.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="div-line"></div>
+
+<!-- ═══ VII. VERDICT ═══ -->
+<div class="section">
+  <div class="sec-eyebrow">Phần VII</div>
+  <div class="sec-title">Khuyến Nghị Theo Mục Tiêu</div>
+
+  <div class="verdict-grid">
+    <div class="v-card">
+      <div class="v-icon">💤</div>
+      <div class="v-title">Thụ động, ít theo dõi</div>
+      <div class="v-who">Phù hợp: NĐT bận rộn, DCA hàng tháng</div>
+      <div class="v-choice vc-etf">E1VFVN30 (60%) + SSISCA (40%)</div>
+      <div class="v-why">Chi phí thấp, không cần theo dõi hàng ngày. E1VFVN30 bám VN30, SSISCA mang lại alpha. Kỳ vọng CAGR 16–20%/năm.</div>
+    </div>
+    <div class="v-card">
+      <div class="v-icon">💰</div>
+      <div class="v-title">Cần dòng tiền cổ tức</div>
+      <div class="v-who">Phù hợp: Nghỉ hưu, thu nhập thụ động</div>
+      <div class="v-choice vc-bank">BID (50%) + ACB (50%)</div>
+      <div class="v-why">BID trả tiền mặt đều đặn, ACB trả cả tiền mặt + cổ phiếu. Cổ tức thực tế ~800–1.500đ/CP/năm tùy năm.</div>
+    </div>
+    <div class="v-card">
+      <div class="v-icon">🚀</div>
+      <div class="v-title">Tăng trưởng tối đa</div>
+      <div class="v-who">Phù hợp: NĐT trẻ, thời gian &gt;5 năm, chấp nhận rủi ro cao</div>
+      <div class="v-choice vc-fund">SSISCA (50%) + ACB/MBB (50%)</div>
+      <div class="v-why">SSISCA vượt thị trường liên tục. ACB/MBB tăng trưởng lợi nhuận 15–22%/năm. CAGR kỳ vọng 20–25%.</div>
+    </div>
+    <div class="v-card">
+      <div class="v-icon">⚖️</div>
+      <div class="v-title">Danh mục cân bằng tối ưu</div>
+      <div class="v-who">Phù hợp: Hầu hết nhà đầu tư trung bình</div>
+      <div class="v-choice vc-mix">E1VFVN30 40% · ACB 30%<br>SSISCA 20% · BID 10%</div>
+      <div class="v-why">Phân tán rủi ro, vừa có tăng trưởng (ETF + ACB), vừa có thu nhập (BID), vừa có alpha (SSISCA).</div>
+    </div>
+  </div>
+
+  <!-- Summary quick-ref -->
+  <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:20px 24px">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px">TRÁNH NẾU MỚI ĐẦU TƯ</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div style="background:var(--red-dim);border:1px solid rgba(255,92,92,.2);border-radius:6px;padding:8px 14px;font-size:13px">
+        <span style="color:var(--red);font-family:'JetBrains Mono',monospace;font-weight:700">TCB</span>
+        <span style="color:var(--muted);margin-left:8px">Không cổ tức · biến động −50% trong 1 năm</span>
+      </div>
+      <div style="background:var(--red-dim);border:1px solid rgba(255,92,92,.2);border-radius:6px;padding:8px 14px;font-size:13px">
+        <span style="color:var(--amber);font-family:'JetBrains Mono',monospace;font-weight:700">FUESSVFL</span>
+        <span style="color:var(--muted);margin-left:8px">Quá tập trung 1 ngành · drawdown −39%</span>
+      </div>
+      <div style="background:var(--red-dim);border:1px solid rgba(255,92,92,.2);border-radius:6px;padding:8px 14px;font-size:13px">
+        <span style="color:var(--green);font-family:'JetBrains Mono',monospace;font-weight:700">MBB</span>
+        <span style="color:var(--muted);margin-left:8px">Cổ tức chủ yếu CP · biến động cao</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="disclaimer">
+  <strong>⚠️ Tuyên bố miễn trừ:</strong> Báo cáo này được tổng hợp từ dữ liệu công khai (SSI, Dragon Capital, HOSE, Bloomberg) và chỉ mang tính chất tham khảo, <strong>không phải khuyến nghị đầu tư</strong>. Hiệu suất quá khứ không đảm bảo kết quả tương lai. Giá cổ phiếu và NAV quỹ thay đổi hàng ngày. Cổ tức phụ thuộc quyết định ĐHCĐ từng năm. Nhà đầu tư cần thực hiện nghiên cứu độc lập và tham vấn chuyên gia tài chính có phép trước khi ra quyết định đầu tư.
+</div>
+
+</div><!-- /page -->
+
+<footer>Báo cáo phân tích tài chính — Cổ phiếu Ngân hàng vs ETF vs Chứng chỉ quỹ — 09/03/2026</footer>
+
+<script>
+Chart.defaults.color = '#606480';
+Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+Chart.defaults.font.family = "'JetBrains Mono', monospace";
+Chart.defaults.font.size = 11;
+
+const YEARS = ['2021','2022','2023','2024'];
+
+// ── Chart 1: Bank stocks annual ──
+new Chart(document.getElementById('chBank'), {
+  type: 'bar',
+  data: {
+    labels: YEARS,
+    datasets: [
+      { label:'VCB', data:[28,-20,15,8],   backgroundColor:(c)=>c.parsed.y>=0?'rgba(245,200,66,.75)':'rgba(255,92,92,.6)', borderRadius:3 },
+      { label:'ACB', data:[60,-35,22,18],  backgroundColor:(c)=>c.parsed.y>=0?'rgba(91,156,246,.75)':'rgba(255,92,92,.55)', borderRadius:3 },
+      { label:'MBB', data:[72,-42,20,15],  backgroundColor:(c)=>c.parsed.y>=0?'rgba(61,220,132,.75)':'rgba(255,92,92,.5)', borderRadius:3 },
+      { label:'TCB', data:[75,-50,35,20],  backgroundColor:(c)=>c.parsed.y>=0?'rgba(255,179,71,.75)':'rgba(255,92,92,.45)', borderRadius:3 },
+      { label:'BID', data:[35,-25,18,12],  backgroundColor:(c)=>c.parsed.y>=0?'rgba(167,139,250,.75)':'rgba(255,92,92,.4)', borderRadius:3 },
+    ]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ position:'top', labels:{ boxWidth:12, padding:12 } } },
+    scales:{
+      y:{ ticks:{ callback:v=>v+'%' }, grid:{ color:'rgba(255,255,255,.05)' } },
+      x:{ grid:{ display:false } }
+    }
+  }
+});
+
+// ── Chart 2: Fund annual ──
+new Chart(document.getElementById('chFund'), {
+  type: 'bar',
+  data: {
+    labels: YEARS,
+    datasets: [
+      { label:'E1VFVN30', data:[43.8,-32.2,12.7,20.6], backgroundColor:(c)=>c.parsed.y>=0?'rgba(91,156,246,.8)':'rgba(255,92,92,.6)', borderRadius:3 },
+      { label:'FUESSVFL', data:[48,-39,18,23.5],        backgroundColor:(c)=>c.parsed.y>=0?'rgba(255,179,71,.8)':'rgba(255,92,92,.5)', borderRadius:3 },
+      { label:'SSISCA',   data:[45,-25,31.7,33.5],      backgroundColor:(c)=>c.parsed.y>=0?'rgba(61,220,132,.8)':'rgba(255,92,92,.4)', borderRadius:3 },
+    ]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ position:'top', labels:{ boxWidth:12, padding:12 } } },
+    scales:{
+      y:{ ticks:{ callback:v=>v+'%' }, grid:{ color:'rgba(255,255,255,.05)' } },
+      x:{ grid:{ display:false } }
+    }
+  }
+});
+
+// ── Chart 3: CAGR horizontal bar ──
+new Chart(document.getElementById('chCAGR'), {
+  type: 'bar',
+  data: {
+    labels: ['TCB','MBB','SSISCA','ACB','FUESSVFL','E1VFVN30','FUESSV30','BID','VCB'],
+    datasets:[{
+      label: '5Y CAGR % ước tính',
+      data: [20,21,21,19,18,16.5,17,15,13],
+      backgroundColor:[
+        'rgba(255,179,71,.8)','rgba(61,220,132,.8)','rgba(61,220,132,.6)',
+        'rgba(91,156,246,.8)','rgba(255,179,71,.6)','rgba(91,156,246,.6)',
+        'rgba(91,156,246,.5)','rgba(167,139,250,.7)','rgba(245,200,66,.7)'
+      ],
+      borderRadius:4
+    }]
+  },
+  options:{
+    indexAxis:'y',
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ display:false } },
+    scales:{
+      x:{ min:8, max:25, ticks:{ callback:v=>v+'%' }, grid:{ color:'rgba(255,255,255,.05)' } },
+      y:{ grid:{ display:false } }
+    }
+  }
+});
+
+// ── Chart 4: Cumulative growth from 100M start of 2021 ──
+new Chart(document.getElementById('chCumul'), {
+  type: 'line',
+  data: {
+    labels: ['Đầu 2021','Cuối 2021','Cuối 2022','Cuối 2023','Cuối 2024'],
+    datasets:[
+      { label:'TCB',      data:[100,175,87.5,118,142], borderColor:'rgba(255,179,71,.9)', backgroundColor:'rgba(255,179,71,.05)', fill:true, tension:.4, pointRadius:4 },
+      { label:'MBB',      data:[100,172,99.8,119,137], borderColor:'rgba(61,220,132,.9)',  backgroundColor:'rgba(61,220,132,.05)',  fill:true, tension:.4, pointRadius:4 },
+      { label:'ACB',      data:[100,160,104,127,150],  borderColor:'rgba(91,156,246,.9)',  backgroundColor:'rgba(91,156,246,.05)',  fill:true, tension:.4, pointRadius:4 },
+      { label:'SSISCA',   data:[100,145,109,143,191],  borderColor:'rgba(61,220,132,.6)',  borderDash:[5,3], backgroundColor:'rgba(61,220,132,.03)', fill:true, tension:.4, pointRadius:4 },
+      { label:'E1VFVN30', data:[100,143.8,97.5,110,133], borderColor:'rgba(91,156,246,.6)', borderDash:[5,3], backgroundColor:'rgba(91,156,246,.03)', fill:true, tension:.4, pointRadius:4 },
+      { label:'VCB',      data:[100,128,102,117,127],  borderColor:'rgba(245,200,66,.7)', borderDash:[3,3], backgroundColor:'rgba(245,200,66,.03)', fill:true, tension:.4, pointRadius:4 },
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ position:'top', labels:{ boxWidth:10, padding:10, font:{ size:10 } } } },
+    scales:{
+      y:{ ticks:{ callback:v=>v+'tr' }, grid:{ color:'rgba(255,255,255,.05)' } },
+      x:{ grid:{ display:false } }
+    }
+  }
+});
+
+// ── Chart 5: Drawdown vs Recovery ──
+new Chart(document.getElementById('chRisk'), {
+  type: 'bar',
+  data: {
+    labels:['VCB','BID','SSISCA','ACB','E1VFVN30','FUESSVFL','MBB','TCB'],
+    datasets:[
+      { label:'Drawdown 2022 (%)', data:[-20,-25,-25,-35,-32.2,-39,-42,-50], backgroundColor:'rgba(255,92,92,.65)', borderRadius:3 },
+      { label:'Phục hồi 2023+2024 (%)', data:[23,30,65.2,40,33.3,41,35,55],  backgroundColor:'rgba(61,220,132,.65)', borderRadius:3 },
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ position:'top', labels:{ boxWidth:12, padding:12 } } },
+    scales:{
+      y:{ ticks:{ callback:v=>v+'%' }, grid:{ color:'rgba(255,255,255,.05)' } },
+      x:{ grid:{ display:false } }
+    }
+  }
+});
+</script>
+</body>
+</html>

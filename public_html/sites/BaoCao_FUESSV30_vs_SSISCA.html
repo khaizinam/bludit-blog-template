@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Báo Cáo Lịch Sử FUESSV30 so với SSISCA</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f7fa; color: #1a1a2e; font-size: 14px; }
+
+  .header {
+    background: linear-gradient(135deg, #0d3b66 0%, #1a5276 50%, #0d6e8a 100%);
+    color: white; padding: 36px 48px; position: relative; overflow: hidden;
+  }
+  .header::after {
+    content: ''; position: absolute; right: -60px; top: -60px;
+    width: 260px; height: 260px; border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+  }
+  .header h1 { font-size: 28px; font-weight: 700; letter-spacing: 0.5px; }
+  .header p { font-size: 14px; opacity: 0.8; margin-top: 6px; }
+  .header .badge {
+    display: inline-block; background: rgba(255,255,255,0.18);
+    border-radius: 20px; padding: 4px 14px; font-size: 12px; margin-top: 12px; margin-right: 8px;
+  }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+
+  .section-title {
+    font-size: 18px; font-weight: 700; color: #0d3b66;
+    border-left: 4px solid #0d6e8a; padding-left: 12px;
+    margin: 32px 0 16px 0;
+  }
+
+  .card {
+    background: white; border-radius: 12px; padding: 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07); margin-bottom: 20px;
+  }
+
+  .info-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;
+    margin-bottom: 20px;
+  }
+  .info-box {
+    background: #f0f7ff; border-radius: 10px; padding: 16px;
+    border-left: 4px solid #0d6e8a;
+  }
+  .info-box .label { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+  .info-box .value { font-size: 16px; font-weight: 700; color: #0d3b66; margin-top: 4px; }
+
+  .kpi-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px;
+  }
+  .kpi-box {
+    background: white; border-radius: 10px; padding: 16px; text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07); border-top: 3px solid;
+  }
+  .kpi-box.blue { border-color: #0d6e8a; }
+  .kpi-box.green { border-color: #27ae60; }
+  .kpi-box.red { border-color: #e74c3c; }
+  .kpi-box.orange { border-color: #f39c12; }
+  .kpi-box .kpi-val { font-size: 22px; font-weight: 800; }
+  .kpi-box .kpi-label { font-size: 12px; color: #666; margin-top: 4px; }
+  .kpi-box.blue .kpi-val { color: #0d6e8a; }
+  .kpi-box.green .kpi-val { color: #27ae60; }
+  .kpi-box.red .kpi-val { color: #e74c3c; }
+  .kpi-box.orange .kpi-val { color: #f39c12; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: #0d3b66; color: white; padding: 10px 14px; text-align: center; font-weight: 600; }
+  th:first-child { text-align: left; border-radius: 6px 0 0 0; }
+  th:last-child { border-radius: 0 6px 0 0; }
+  td { padding: 9px 14px; border-bottom: 1px solid #eef2f7; text-align: center; }
+  td:first-child { text-align: left; font-weight: 600; }
+  tr:nth-child(even) td { background: #f8fafd; }
+  tr:hover td { background: #e8f4fd; }
+  .pos { color: #27ae60; font-weight: 700; }
+  .neg { color: #e74c3c; font-weight: 700; }
+  .neutral { color: #888; }
+
+  .chart-wrap { position: relative; height: 280px; width: 100%; }
+  .chart-wrap-sm { position: relative; height: 220px; width: 100%; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media(max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+  .compare-header {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0;
+    background: #0d3b66; color: white; border-radius: 8px 8px 0 0;
+    font-weight: 700; font-size: 13px;
+  }
+  .compare-header > div { padding: 12px 16px; text-align: center; }
+  .compare-header > div:first-child { text-align: left; }
+  .compare-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0;
+    border-bottom: 1px solid #eef2f7; font-size: 13px;
+  }
+  .compare-row > div { padding: 10px 16px; text-align: center; }
+  .compare-row > div:first-child { text-align: left; font-weight: 600; color: #444; }
+  .compare-row:nth-child(even) { background: #f8fafd; }
+  .compare-row:hover { background: #e8f4fd; }
+  .fuessv30-val { color: #0d6e8a; font-weight: 700; }
+  .ssisca-val { color: #8e44ad; font-weight: 700; }
+
+  .timeline {
+    position: relative; padding-left: 28px;
+  }
+  .timeline::before {
+    content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: #d0e8f5;
+  }
+  .tl-item { position: relative; margin-bottom: 18px; }
+  .tl-dot {
+    position: absolute; left: -24px; top: 4px;
+    width: 12px; height: 12px; border-radius: 50%; background: #0d6e8a; border: 2px solid white;
+    box-shadow: 0 0 0 2px #0d6e8a;
+  }
+  .tl-year { font-weight: 700; color: #0d3b66; font-size: 13px; }
+  .tl-desc { color: #555; font-size: 13px; margin-top: 2px; line-height: 1.5; }
+
+  .note { background: #fff8e1; border-left: 4px solid #f39c12; padding: 12px 16px; border-radius: 6px; font-size: 12px; color: #7d5a00; margin-top: 16px; }
+
+  .tag {
+    display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; margin-right: 4px;
+  }
+  .tag-etf { background: #d6eaf8; color: #0d6e8a; }
+  .tag-active { background: #e8daef; color: #8e44ad; }
+  .tag-passive { background: #d5f5e3; color: #1a7a4a; }
+
+  footer { text-align: center; font-size: 11px; color: #aaa; padding: 24px; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📊 Báo Cáo Lịch Sử Quỹ FUESSV30</h1>
+  <p>So sánh toàn diện FUESSV30 (ETF SSIAM VN30) vs SSISCA (SSI-SCA)</p>
+  <span class="badge">Ngày lập: 09/03/2026</span>
+  <span class="badge">Nguồn: SSIAM, Bloomberg, VSD</span>
+  <span class="badge">Giai đoạn: 2020–2025</span>
+</div>
+
+<div class="container">
+
+  <!-- THÔNG TIN CƠ BẢN -->
+  <div class="section-title">I. THÔNG TIN CƠ BẢN</div>
+  <div class="card">
+    <div class="info-grid">
+      <div class="info-box">
+        <div class="label">Tên đầy đủ</div>
+        <div class="value">Quỹ ETF SSIAM VN30</div>
+      </div>
+      <div class="info-box">
+        <div class="label">Mã giao dịch</div>
+        <div class="value">FUESSV30</div>
+      </div>
+      <div class="info-box">
+        <div class="label">Ngày thành lập</div>
+        <div class="value">22/06/2020</div>
+      </div>
+      <div class="info-box">
+        <div class="label">Ngày niêm yết HOSE</div>
+        <div class="value">18/08/2020</div>
+      </div>
+      <div class="info-box">
+        <div class="label">Vốn điều lệ ban đầu</div>
+        <div class="value">56 tỷ VND</div>
+      </div>
+      <div class="info-box">
+        <div class="label">Công ty quản lý</div>
+        <div class="value">SSIAM (SSI)</div>
+      </div>
+      <div class="info-box">
+        <div class="label">Chỉ số tham chiếu</div>
+        <div class="value">VN30 Index</div>
+      </div>
+      <div class="info-box">
+        <div class="label">Ngân hàng giám sát</div>
+        <div class="value">Vietcombank</div>
+      </div>
+      <div class="info-box">
+        <div class="label">Phí quản lý/năm</div>
+        <div class="value">0.55% (TER ~0.75–0.8%)</div>
+      </div>
+      <div class="info-box">
+        <div class="label">Thành viên lập quỹ</div>
+        <div class="value">SSI, Mirae Asset, BSC, KIS, BVSC, Vietcap</div>
+      </div>
+    </div>
+    <div style="margin-top:8px">
+      <span class="tag tag-etf">ETF – Hoán đổi danh mục</span>
+      <span class="tag tag-passive">Đầu tư thụ động</span>
+      <span class="tag tag-etf">Niêm yết HOSE</span>
+    </div>
+  </div>
+
+  <!-- DÒNG THỜI GIAN -->
+  <div class="section-title">II. LỊCH SỬ HOẠT ĐỘNG</div>
+  <div class="card">
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">21/05/2020 — Cấp phép chào bán</div>
+        <div class="tl-desc">UBCKNN cấp giấy chứng nhận đăng ký chào bán chứng chỉ quỹ ra công chúng. IPO diễn ra từ 01/06 – 26/06/2020, huy động được 56 tỷ đồng.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">22/06/2020 — Thành lập quỹ</div>
+        <div class="tl-desc">UBCKNN cấp giấy chứng nhận đăng ký lập quỹ đại chúng. Vốn điều lệ 56 tỷ đồng, 5.6 triệu chứng chỉ quỹ.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">18/08/2020 — Niêm yết & giao dịch lần đầu</div>
+        <div class="tl-desc">Chính thức giao dịch trên HOSE với giá tham chiếu 9,805 đ/ccq. Phiên đầu kết thúc ở 10,000 đ, tăng ~2%. Thanh khoản 197,300 đơn vị (~1.96 tỷ đồng).</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2020–2021 — Giai đoạn tăng trưởng mạnh</div>
+        <div class="tl-desc">VN30 phục hồi mạnh sau Covid-19, thanh khoản thị trường tăng đột biến. Quỹ tăng ~43.85% năm 2021, bám sát chỉ số VN30 (+43.42%).</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2022 — Thị trường điều chỉnh sâu</div>
+        <div class="tl-desc">VN30 giảm mạnh theo xu hướng toàn cầu (lãi suất Fed, rủi ro trái phiếu DN). Quỹ ghi nhận mức sinh lời âm ~32.17%, phản ánh trung thực biến động VN30.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2023 — Phục hồi và mở rộng</div>
+        <div class="tl-desc">Thị trường phục hồi. Quỹ tăng ~12.70%, bám sát VN30 (+12.56%). Mở rộng thành viên lập quỹ thêm KIS, BVSC, Vietcap — tăng thanh khoản sơ cấp.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2024 — Đà tăng trưởng ổn định</div>
+        <div class="tl-desc">Quỹ tăng ~20.60% (tốt hơn VN30-Index +19.54%). NAV đạt trên 200 tỷ VND, vốn hóa vượt 209 tỷ đồng. Tổng sinh lời từ thành lập đạt ~58.34%.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot" style="background:#f39c12"></div>
+        <div class="tl-year">2025 (đến T3/2026) — Biến động & tích lũy</div>
+        <div class="tl-desc">Giá giao dịch quanh 23,700–25,470 đ/ccq. Tổng sinh lời 5 năm đạt ~80.38%. Tổng sinh lời từ thành lập ~116.58% (TradingView, 3/2026).</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI TỔNG QUAN -->
+  <div class="section-title">III. KẾT QUẢ ĐẦU TƯ – CHỈ SỐ HIỆU SUẤT</div>
+  <div class="kpi-grid" style="margin-bottom:20px">
+    <div class="kpi-box blue">
+      <div class="kpi-val">+116.6%</div>
+      <div class="kpi-label">Tổng sinh lời từ thành lập (2020–2026)</div>
+    </div>
+    <div class="kpi-box green">
+      <div class="kpi-val">+80.4%</div>
+      <div class="kpi-label">Sinh lời 5 năm (2021–2025)</div>
+    </div>
+    <div class="kpi-box orange">
+      <div class="kpi-val">+53.7%</div>
+      <div class="kpi-label">Sinh lời 1 năm gần nhất</div>
+    </div>
+    <div class="kpi-box blue">
+      <div class="kpi-val">~17.5%</div>
+      <div class="kpi-label">Tỷ suất sinh lời TB/năm (CAGR ~)</div>
+    </div>
+    <div class="kpi-box green">
+      <div class="kpi-val">209 tỷ</div>
+      <div class="kpi-label">Vốn hóa thị trường (VND)</div>
+    </div>
+    <div class="kpi-box orange">
+      <div class="kpi-val">0.55%</div>
+      <div class="kpi-label">Phí quản lý năm</div>
+    </div>
+  </div>
+
+  <!-- BẢNG HIỆU SUẤT HÀNG NĂM -->
+  <div class="card">
+    <div style="font-weight:700; color:#0d3b66; margin-bottom:16px; font-size:15px">📈 Hiệu Suất Đầu Tư Hàng Năm — FUESSV30 vs VN30 Index</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Năm</th>
+          <th>FUESSV30 (%)</th>
+          <th>VN30 Index (%)</th>
+          <th>Chênh lệch (bp)</th>
+          <th>Bối cảnh thị trường</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>2020 (T8–T12)</td>
+          <td class="pos">+2.0</td>
+          <td class="pos">+1.5</td>
+          <td class="pos">+50bp</td>
+          <td>Ra mắt thị trường, VN30 phục hồi sau Covid-19</td>
+        </tr>
+        <tr>
+          <td>2021</td>
+          <td class="pos">+43.85</td>
+          <td class="pos">+43.42</td>
+          <td class="pos">+43bp</td>
+          <td>Bùng nổ nhà đầu tư cá nhân, thanh khoản đỉnh cao</td>
+        </tr>
+        <tr>
+          <td>2022</td>
+          <td class="neg">−32.17</td>
+          <td class="neg">−32.20</td>
+          <td class="pos">+3bp</td>
+          <td>Fed tăng lãi suất mạnh, bê bối trái phiếu DN VN</td>
+        </tr>
+        <tr>
+          <td>2023</td>
+          <td class="pos">+12.70</td>
+          <td class="pos">+12.56</td>
+          <td class="pos">+14bp</td>
+          <td>Phục hồi ổn định, nới lỏng chính sách tiền tệ</td>
+        </tr>
+        <tr>
+          <td>2024</td>
+          <td class="pos">+20.60</td>
+          <td class="pos">+19.54</td>
+          <td class="pos">+106bp</td>
+          <td>Ngân hàng và CN dẫn dắt, kỳ vọng nâng hạng TT</td>
+        </tr>
+        <tr>
+          <td>2025 (ước)</td>
+          <td class="pos">+8–12</td>
+          <td class="pos">+7–11</td>
+          <td class="pos">~+50bp</td>
+          <td>Tăng trưởng GDP 6–7%, nâng hạng TT tiếp tục</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="note">
+      ⓘ Số liệu dựa trên báo cáo SSIAM tháng 5/2024, TradingView, Bloomberg. Năm 2020 chỉ tính từ T8 (ngày niêm yết). Năm 2025 là ước tính đến T3/2026.
+    </div>
+  </div>
+
+  <!-- BIỂU ĐỒ HIỆU SUẤT -->
+  <div class="card">
+    <div style="font-weight:700; color:#0d3b66; margin-bottom:16px; font-size:15px">📊 Biểu Đồ Hiệu Suất Hàng Năm</div>
+    <div class="chart-wrap">
+      <canvas id="chartPerf"></canvas>
+    </div>
+  </div>
+
+  <!-- BIỂU ĐỒ TÍCH LŨY -->
+  <div class="card">
+    <div style="font-weight:700; color:#0d3b66; margin-bottom:16px; font-size:15px">📈 Tăng Trưởng Tích Lũy NAV — Đầu tư 100 triệu từ tháng 8/2020</div>
+    <div class="chart-wrap">
+      <canvas id="chartCumulative"></canvas>
+    </div>
+  </div>
+
+  <!-- TỶ TRỌNG NGÀNH -->
+  <div class="section-title">IV. PHÂN BỔ DANH MỤC THEO NGÀNH</div>
+  <div class="two-col">
+    <div class="card">
+      <div style="font-weight:700; color:#0d6e8a; margin-bottom:12px">FUESSV30 — Cơ cấu ngành (%NAV)</div>
+      <div class="chart-wrap-sm">
+        <canvas id="chartFUESSV30Sector"></canvas>
+      </div>
+      <div style="margin-top:12px; font-size:12px; color:#555; line-height:1.8">
+        <div>🔵 <b>Tài chính – Ngân hàng:</b> ~42–55% (VPB, TCB, ACB, MBB, BID, VCB...)</div>
+        <div>🟢 <b>Bất động sản:</b> ~15–20% (VIC, VHM, NVL, DIG...)</div>
+        <div>🟡 <b>Công nghệ (FPT):</b> ~6–8%</div>
+        <div>🟠 <b>Bán lẻ (MWG, MSN):</b> ~6–8%</div>
+        <div>🔴 <b>Công nghiệp – Vật liệu (HPG):</b> ~5–7%</div>
+        <div>⚪ <b>Tiêu dùng (VNM) + khác:</b> ~5–8%</div>
+      </div>
+      <div class="note" style="margin-top:10px">Phương pháp mô phỏng toàn bộ VN30. Cơ cấu thay đổi mỗi 3–6 tháng theo rổ VN30.</div>
+    </div>
+    <div class="card">
+      <div style="font-weight:700; color:#8e44ad; margin-bottom:12px">SSISCA — Cơ cấu ngành (%NAV, T6/2024)</div>
+      <div class="chart-wrap-sm">
+        <canvas id="chartSSISCASector"></canvas>
+      </div>
+      <div style="margin-top:12px; font-size:12px; color:#555; line-height:1.8">
+        <div>🔵 <b>Ngân hàng:</b> ~34% (ACB, CTG, TCB, MBB, VCB...)</div>
+        <div>🟡 <b>Công nghệ (FPT):</b> ~17% (cổ phiếu đơn lẻ lớn nhất: 13–15%)</div>
+        <div>🟢 <b>Bất động sản:</b> ~9%</div>
+        <div>🟠 <b>Bán lẻ (MWG):</b> ~7%</div>
+        <div>🔴 <b>Tiêu dùng + Công nghiệp:</b> ~8%</div>
+        <div>⚪ <b>Tiền mặt + Tài sản thu nhập cố định:</b> ~5–25%</div>
+      </div>
+      <div class="note" style="margin-top:10px">Chiến lược chủ động. Danh mục được điều chỉnh hàng tháng dựa theo nhận định thị trường.</div>
+    </div>
+  </div>
+
+  <!-- SO SÁNH FUESSV30 VS SSISCA -->
+  <div class="section-title">V. SO SÁNH TOÀN DIỆN FUESSV30 vs SSISCA</div>
+  <div class="card">
+    <div class="compare-header">
+      <div>Tiêu chí</div>
+      <div style="color:#4fc3f7">FUESSV30</div>
+      <div style="color:#ce93d8">SSISCA</div>
+    </div>
+    <div class="compare-row">
+      <div>Loại quỹ</div>
+      <div class="fuessv30-val">ETF – Niêm yết HOSE</div>
+      <div class="ssisca-val">Quỹ mở chủ động</div>
+    </div>
+    <div class="compare-row">
+      <div>Ngày thành lập</div>
+      <div class="fuessv30-val">22/06/2020</div>
+      <div class="ssisca-val">26/09/2014</div>
+    </div>
+    <div class="compare-row">
+      <div>Chiến lược đầu tư</div>
+      <div class="fuessv30-val">Thụ động (mô phỏng VN30)</div>
+      <div class="ssisca-val">Chủ động (cổ phiếu lợi thế bền vững)</div>
+    </div>
+    <div class="compare-row">
+      <div>Số lượng cổ phiếu trong danh mục</div>
+      <div class="fuessv30-val">30 (cố định – rổ VN30)</div>
+      <div class="ssisca-val">15–25 (lựa chọn chủ động)</div>
+    </div>
+    <div class="compare-row">
+      <div>Phí quản lý / năm</div>
+      <div class="fuessv30-val">0.55% (TER ~0.75–0.8%)</div>
+      <div class="ssisca-val">1.5% (ước tính)</div>
+    </div>
+    <div class="compare-row">
+      <div>Tần suất giao dịch</div>
+      <div class="fuessv30-val">Liên tục (T2–T6, mua/bán như CP)</div>
+      <div class="ssisca-val">Hàng tuần (T3)</div>
+    </div>
+    <div class="compare-row">
+      <div>Thanh khoản</div>
+      <div class="fuessv30-val">Cao nhất nhóm ETF VN30</div>
+      <div class="ssisca-val">Trung bình (quỹ mở)</div>
+    </div>
+    <div class="compare-row">
+      <div>Phân bổ cổ phiếu tài chính</div>
+      <div class="fuessv30-val">~42–55%</div>
+      <div class="ssisca-val">~34% (lọc kỹ hơn)</div>
+    </div>
+    <div class="compare-row">
+      <div>Tỷ trọng công nghệ</div>
+      <div class="fuessv30-val">~6–8% (FPT)</div>
+      <div class="ssisca-val">~17% (FPT là cổ phiếu lớn nhất)</div>
+    </div>
+    <div class="compare-row">
+      <div>Hiệu suất 2021</div>
+      <div class="fuessv30-val pos">+43.85%</div>
+      <div class="ssisca-val pos">~+45% (ước)</div>
+    </div>
+    <div class="compare-row">
+      <div>Hiệu suất 2022</div>
+      <div class="fuessv30-val neg">−32.17%</div>
+      <div class="ssisca-val neg">~−25% (ước, phòng thủ tốt hơn)</div>
+    </div>
+    <div class="compare-row">
+      <div>Hiệu suất 2023</div>
+      <div class="fuessv30-val pos">+12.70%</div>
+      <div class="ssisca-val pos">+31.7%</div>
+    </div>
+    <div class="compare-row">
+      <div>Hiệu suất 2024</div>
+      <div class="fuessv30-val pos">+20.60%</div>
+      <div class="ssisca-val pos">+33.5%</div>
+    </div>
+    <div class="compare-row">
+      <div>4 năm liên tiếp vượt chỉ số</div>
+      <div class="fuessv30-val">Không (bám sát VN30)</div>
+      <div class="ssisca-val">✅ Có (2020–2023)</div>
+    </div>
+    <div class="compare-row">
+      <div>Tiền mặt / tài sản phòng thủ</div>
+      <div class="fuessv30-val">≈ 0% (đầu tư 100% CP)</div>
+      <div class="ssisca-val">Linh hoạt: 2–90% (tùy thị trường)</div>
+    </div>
+    <div class="compare-row">
+      <div>Mức đầu tư tối thiểu</div>
+      <div class="fuessv30-val">100 ccq × giá thị trường (~2.5tr)</div>
+      <div class="ssisca-val">1–2 triệu đồng</div>
+    </div>
+    <div class="compare-row">
+      <div>Phù hợp với</div>
+      <div class="fuessv30-val">NĐT muốn đơn giản, chi phí thấp, tiếp cận VN30</div>
+      <div class="ssisca-val">NĐT tin tưởng đội ngũ quản lý chủ động, kỳ vọng alpha</div>
+    </div>
+  </div>
+
+  <!-- BIỂU ĐỒ SO SÁNH HIỆU SUẤT -->
+  <div class="card">
+    <div style="font-weight:700; color:#0d3b66; margin-bottom:16px; font-size:15px">📊 So Sánh Hiệu Suất Hàng Năm: FUESSV30 vs SSISCA</div>
+    <div class="chart-wrap">
+      <canvas id="chartCompare"></canvas>
+    </div>
+  </div>
+
+  <!-- ĐỘ ỔN ĐỊNH -->
+  <div class="section-title">VI. ĐÁNH GIÁ ĐỘ ỔN ĐỊNH</div>
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Chỉ số đánh giá</th>
+          <th>FUESSV30</th>
+          <th>SSISCA</th>
+          <th>Nhận xét</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Tracking Error (vs VN30)</td>
+          <td class="pos">&lt; 0.5%/năm</td>
+          <td class="neutral">N/A (chủ động)</td>
+          <td>FUESSV30 bám sát VN30 rất chính xác</td>
+        </tr>
+        <tr>
+          <td>Biến động (Volatility)</td>
+          <td class="neutral">Cao (phụ thuộc VN30)</td>
+          <td class="neutral">Trung bình–Cao</td>
+          <td>Cả hai đều có biến động theo thị trường</td>
+        </tr>
+        <tr>
+          <td>Drawdown tệ nhất (2022)</td>
+          <td class="neg">~−35%</td>
+          <td class="neutral">~−28% (ước)</td>
+          <td>SSISCA phòng thủ tốt hơn khi thị trường xấu</td>
+        </tr>
+        <tr>
+          <td>Phục hồi sau đáy 2022</td>
+          <td class="pos">Nhanh (bám VN30)</td>
+          <td class="pos">Nhanh và vượt trội hơn</td>
+          <td>Cả hai phục hồi tốt trong 2023–2024</td>
+        </tr>
+        <tr>
+          <td>Tỷ suất Sharpe (ước)</td>
+          <td class="pos">~0.8–1.0</td>
+          <td class="pos">~1.0–1.3</td>
+          <td>SSISCA có điều chỉnh rủi ro tốt hơn</td>
+        </tr>
+        <tr>
+          <td>Tính nhất quán danh mục</td>
+          <td class="pos">Rất cao (cố định VN30)</td>
+          <td class="neutral">Trung bình (điều chỉnh tháng)</td>
+          <td>FUESSV30 minh bạch hơn về danh mục</td>
+        </tr>
+        <tr>
+          <td>Rủi ro quản lý quỹ</td>
+          <td class="pos">Rất thấp (thụ động)</td>
+          <td class="neutral">Trung bình (phụ thuộc đội ngũ)</td>
+          <td>FUESSV30 không có rủi ro "fund manager"</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- KẾT LUẬN -->
+  <div class="section-title">VII. KẾT LUẬN & KHUYẾN NGHỊ</div>
+  <div class="two-col">
+    <div class="card" style="border-top: 4px solid #0d6e8a">
+      <div style="font-weight:700; color:#0d6e8a; font-size:15px; margin-bottom:12px">✅ FUESSV30 — Điểm mạnh</div>
+      <div style="font-size:13px; line-height:2; color:#333">
+        ✔ Chi phí thấp nhất trên thị trường (TER ~0.75%)<br>
+        ✔ Thanh khoản cao, giao dịch linh hoạt như cổ phiếu<br>
+        ✔ Minh bạch 100% danh mục (theo VN30)<br>
+        ✔ Bám sát chỉ số VN30 chính xác (tracking error &lt;0.5%)<br>
+        ✔ Phù hợp chiến lược DCA dài hạn<br>
+        ✔ Tổng sinh lời từ thành lập +116.6% (2020–2026)
+      </div>
+    </div>
+    <div class="card" style="border-top: 4px solid #8e44ad">
+      <div style="font-weight:700; color:#8e44ad; font-size:15px; margin-bottom:12px">✅ SSISCA — Điểm mạnh</div>
+      <div style="font-size:13px; line-height:2; color:#333">
+        ✔ Liên tục vượt VN30 Index (4 năm 2020–2023)<br>
+        ✔ Hiệu suất 2023 (+31.7%) và 2024 (+33.5%) vượt trội<br>
+        ✔ Có khả năng phòng thủ khi thị trường xấu (tăng tiền mặt)<br>
+        ✔ Tập trung vào cổ phiếu chất lượng cao (FPT, ACB, CTG...)<br>
+        ✔ 10 năm kinh nghiệm, đội ngũ chuyên gia dày dạn<br>
+        ✔ Vốn tối thiểu thấp (từ 1–2 triệu đồng)
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="font-weight:700; color:#0d3b66; font-size:15px; margin-bottom:12px">🎯 Tóm tắt lựa chọn phù hợp theo mục tiêu</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Nếu bạn muốn...</th>
+          <th>Lựa chọn tốt hơn</th>
+          <th>Lý do</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Chi phí thấp, đơn giản, DCA dài hạn</td>
+          <td class="fuessv30-val">FUESSV30</td>
+          <td>TER thấp, không cần chọn thời điểm</td>
+        </tr>
+        <tr>
+          <td>Vượt trội thị trường (alpha), quản lý chủ động</td>
+          <td class="ssisca-val">SSISCA</td>
+          <td>Đội ngũ đã chứng minh alpha dài hạn</td>
+        </tr>
+        <tr>
+          <td>Bảo vệ vốn khi thị trường sụt giảm</td>
+          <td class="ssisca-val">SSISCA</td>
+          <td>Linh hoạt tăng tiền mặt/trái phiếu</td>
+        </tr>
+        <tr>
+          <td>Thanh khoản cao, vào/ra nhanh</td>
+          <td class="fuessv30-val">FUESSV30</td>
+          <td>Giao dịch liên tục trên HOSE</td>
+        </tr>
+        <tr>
+          <td>Vốn nhỏ (dưới 5 triệu)</td>
+          <td class="ssisca-val">SSISCA</td>
+          <td>Mua tối thiểu từ 1–2 triệu đồng</td>
+        </tr>
+        <tr>
+          <td>Danh mục kết hợp (tối ưu)</td>
+          <td style="color:#c0392b; font-weight:700">Cả hai</td>
+          <td>FUESSV30 (thụ động) + SSISCA (chủ động)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <b>⚠️ Tuyên bố miễn trừ:</b> Báo cáo này chỉ mang tính chất tham khảo, được tổng hợp từ dữ liệu công khai của SSIAM, Bloomberg, TradingView và các nguồn báo chí tài chính. Hiệu suất quá khứ không đảm bảo kết quả tương lai. Nhà đầu tư cần nghiên cứu kỹ và tham vấn chuyên gia trước khi đầu tư.
+  </div>
+</div>
+
+<footer>Báo cáo lịch sử FUESSV30 — Lập ngày 09/03/2026 | Dữ liệu: SSIAM, Bloomberg, VSD, TradingView</footer>
+
+<script>
+// Chart 1: Annual Performance Bar
+const ctx1 = document.getElementById('chartPerf').getContext('2d');
+new Chart(ctx1, {
+  type: 'bar',
+  data: {
+    labels: ['2020 (T8-12)', '2021', '2022', '2023', '2024', '2025 (ước)'],
+    datasets: [
+      {
+        label: 'FUESSV30 (%)',
+        data: [2.0, 43.85, -32.17, 12.70, 20.60, 10],
+        backgroundColor: (ctx) => ctx.parsed.y >= 0 ? 'rgba(13,110,138,0.8)' : 'rgba(231,76,60,0.7)',
+        borderRadius: 4
+      },
+      {
+        label: 'VN30 Index (%)',
+        data: [1.5, 43.42, -32.20, 12.56, 19.54, 9],
+        backgroundColor: (ctx) => ctx.parsed.y >= 0 ? 'rgba(13,110,138,0.3)' : 'rgba(231,76,60,0.3)',
+        borderRadius: 4
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top' } },
+    scales: {
+      y: { grid: { color: '#f0f0f0' }, ticks: { callback: v => v + '%' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// Chart 2: Cumulative growth
+const ctx2 = document.getElementById('chartCumulative').getContext('2d');
+const growth = [100, 102, 146.7, 99.5, 112.1, 135.2, 149.5];
+const labels2 = ['T8/2020', 'Cuối 2020', 'Cuối 2021', 'Cuối 2022', 'Cuối 2023', 'Cuối 2024', 'T3/2026 (ước)'];
+new Chart(ctx2, {
+  type: 'line',
+  data: {
+    labels: labels2,
+    datasets: [
+      {
+        label: 'FUESSV30 (triệu đồng, bắt đầu 100tr)',
+        data: growth,
+        borderColor: '#0d6e8a', backgroundColor: 'rgba(13,110,138,0.1)',
+        fill: true, tension: 0.3, pointRadius: 5, pointBackgroundColor: '#0d6e8a'
+      },
+      {
+        label: 'SSISCA (triệu đồng)',
+        data: [100, 103, 150, 112, 146, 194, 216],
+        borderColor: '#8e44ad', backgroundColor: 'rgba(142,68,173,0.07)',
+        fill: true, tension: 0.3, pointRadius: 5, pointBackgroundColor: '#8e44ad',
+        borderDash: [5,3]
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top' } },
+    scales: {
+      y: { grid: { color: '#f0f0f0' }, ticks: { callback: v => v + 'tr' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// Chart 3: FUESSV30 Sector
+const ctx3 = document.getElementById('chartFUESSV30Sector').getContext('2d');
+new Chart(ctx3, {
+  type: 'doughnut',
+  data: {
+    labels: ['Tài chính - Ngân hàng', 'Bất động sản', 'Công nghệ (FPT)', 'Bán lẻ', 'Công nghiệp - Vật liệu', 'Tiêu dùng + khác'],
+    datasets: [{
+      data: [48, 18, 7, 7, 6, 14],
+      backgroundColor: ['#0d6e8a','#27ae60','#f39c12','#e74c3c','#8e44ad','#95a5a6'],
+      borderWidth: 2, borderColor: '#fff'
+    }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } } }
+});
+
+// Chart 4: SSISCA Sector
+const ctx4 = document.getElementById('chartSSISCASector').getContext('2d');
+new Chart(ctx4, {
+  type: 'doughnut',
+  data: {
+    labels: ['Ngân hàng', 'Công nghệ (FPT)', 'Bất động sản', 'Bán lẻ (MWG)', 'Tiêu dùng + CN', 'Tiền mặt + TSCĐ'],
+    datasets: [{
+      data: [34, 17, 9, 7, 8, 25],
+      backgroundColor: ['#0d6e8a','#f39c12','#27ae60','#e74c3c','#8e44ad','#bdc3c7'],
+      borderWidth: 2, borderColor: '#fff'
+    }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } } }
+});
+
+// Chart 5: Compare
+const ctx5 = document.getElementById('chartCompare').getContext('2d');
+new Chart(ctx5, {
+  type: 'bar',
+  data: {
+    labels: ['2021', '2022', '2023', '2024'],
+    datasets: [
+      {
+        label: 'FUESSV30 (%)',
+        data: [43.85, -32.17, 12.70, 20.60],
+        backgroundColor: (ctx) => ctx.parsed.y >= 0 ? 'rgba(13,110,138,0.8)' : 'rgba(231,76,60,0.7)',
+        borderRadius: 4
+      },
+      {
+        label: 'SSISCA (%)',
+        data: [45, -25, 31.7, 33.5],
+        backgroundColor: (ctx) => ctx.parsed.y >= 0 ? 'rgba(142,68,173,0.8)' : 'rgba(231,76,60,0.4)',
+        borderRadius: 4
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top' } },
+    scales: {
+      y: { grid: { color: '#f0f0f0' }, ticks: { callback: v => v + '%' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+</script>
+</body>
+</html>
