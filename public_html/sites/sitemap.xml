@@ -22,4 +22,25 @@
     <priority>0.9</priority>
   </url>
 
+  <url>
+    <loc>https://genseo.khaizinam.io.vn/sites/SoSanh_ETF_VN30_vs_TheGioi</loc>
+    <lastmod>2026-03-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://genseo.khaizinam.io.vn/sites/CoPhieu_NganHang_vs_ETF_vs_Quy</loc>
+    <lastmod>2026-03-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://genseo.khaizinam.io.vn/sites/BaoCao_FUESSV30_vs_SSISCA</loc>
+    <lastmod>2026-03-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
 </urlset>
